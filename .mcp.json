@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "biocontext-kb": {
+      "type": "url",
+      "url": "https://biocontext-kb.fastmcp.app/mcp"
+    },
+    "dna-agents-mcp": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "dna-agents-mcp", "serve", "--transport", "stdio"]
+    }
+  }
+}

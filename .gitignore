@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Claude Code — ignore personal settings, commit shared agent definitions
+.claude/settings.json
+.claude/settings.local.json
+!.claude/agents/
+!.claude/workflows/

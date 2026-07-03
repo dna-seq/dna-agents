@@ -1,0 +1,16 @@
+schema_version: "1.0"
+
+module:
+  name: sirtuin_longevity
+  title: "Sirtuin Longevity"
+  description: "Sirtuin pathway variants associated with human longevity and healthy aging"
+  report_title: "Sirtuin Longevity Panel"
+  icon: heart-pulse
+  color: "#21ba45"
+
+defaults:
+  curator: ai-module-creator
+  method: literature-review
+  priority: medium
+
+genome_build: GRCh38

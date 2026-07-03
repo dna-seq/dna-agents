@@ -1,0 +1,22 @@
+rsid,genotype,weight,state,conclusion,priority,gene,phenotype,category
+rs3758391,C/C,0.5,protective,"SIRT1 rs3758391 CC — C allele associated with longevity in Chinese Han centenarians. May enhance SIRT1 promoter activity. Replication in European cohorts was suggestive at gene level but not significant for this SNP after multiple testing correction.",medium,SIRT1,Longevity — SIRT1 promoter,sirtuin
+rs3758391,C/T,0.25,protective,"SIRT1 rs3758391 CT heterozygous — one copy of the longevity-associated C allele. Intermediate effect.",low,SIRT1,Longevity — SIRT1 promoter,sirtuin
+rs3758391,T/T,0.0,neutral,"SIRT1 rs3758391 TT — reference genotype. Standard SIRT1 promoter activity.",low,SIRT1,Longevity — SIRT1 promoter,sirtuin
+rs12778366,C/C,0.5,protective,"SIRT1 rs12778366 CC — minor allele homozygous. Associated with better glucose tolerance and lower HbA1c in the Leiden Longevity Study. Not replicated in Danish–German–Dutch or Ashkenazi Jewish cohorts.",medium,SIRT1,Glucose metabolism — SIRT1,sirtuin
+rs12778366,C/G,0.25,protective,"SIRT1 rs12778366 CG heterozygous — carriers of the minor C allele showed improved glucose metabolism in Dutch longevity families.",low,SIRT1,Glucose metabolism — SIRT1,sirtuin
+rs12778366,G/G,0.0,neutral,"SIRT1 rs12778366 GG — reference genotype. Standard glucose metabolism profile at this locus.",low,SIRT1,Glucose metabolism — SIRT1,sirtuin
+rs7896005,G/G,0.4,protective,"SIRT1 rs7896005 GG — G allele associated with longer telomere length in a US Caucasian cohort. May reflect enhanced SIRT1-mediated telomere maintenance. No direct longevity association in Ashkenazi Jewish replication study.",medium,SIRT1,Telomere length — SIRT1,sirtuin
+rs7896005,A/G,0.2,protective,"SIRT1 rs7896005 AG heterozygous — one copy of the telomere-associated G allele. Intermediate effect on telomere length.",low,SIRT1,Telomere length — SIRT1,sirtuin
+rs7896005,A/A,0.0,neutral,"SIRT1 rs7896005 AA — reference genotype. Standard telomere length profile at this locus.",low,SIRT1,Telomere length — SIRT1,sirtuin
+rs4746720,C/C,0.3,protective,"SIRT1 rs4746720 CC — C allele was more common in Chinese Han longevity group. Located in 3'UTR; may affect mRNA stability. Not significant when analyzed independently from rs3758391.",low,SIRT1,Longevity — SIRT1 3'UTR,sirtuin
+rs4746720,C/G,0.15,protective,"SIRT1 rs4746720 CG heterozygous — one copy of the longevity-associated C allele. Modest effect.",low,SIRT1,Longevity — SIRT1 3'UTR,sirtuin
+rs4746720,G/G,0.0,neutral,"SIRT1 rs4746720 GG — reference genotype. Standard SIRT1 3'UTR regulation.",low,SIRT1,Longevity — SIRT1 3'UTR,sirtuin
+rs11555236,A/A,0.4,protective,"SIRT3 rs11555236 AA — associated with improved survival in Italian Northern cohort longitudinal analysis. Cross-sectional centenarian vs control comparison was not significant. European multi-center study also negative.",medium,SIRT3,Survival — SIRT3 mitochondrial,sirtuin
+rs11555236,A/T,0.2,protective,"SIRT3 rs11555236 AT heterozygous — intermediate survival association in longitudinal Italian cohort analysis.",low,SIRT3,Survival — SIRT3 mitochondrial,sirtuin
+rs11555236,T/T,0.0,neutral,"SIRT3 rs11555236 TT — reference genotype. Standard SIRT3 mitochondrial deacetylase activity.",low,SIRT3,Survival — SIRT3 mitochondrial,sirtuin
+rs4980329,A/A,0.4,protective,"SIRT3 rs4980329 AA — associated with improved longitudinal survival in Italian Northern cohort. SIRT3 regulates mitochondrial ROS detoxification. Cross-sectional analysis was not significant.",medium,SIRT3,Survival — SIRT3 mitochondrial,sirtuin
+rs4980329,A/T,0.2,protective,"SIRT3 rs4980329 AT heterozygous — intermediate survival association in longitudinal analysis.",low,SIRT3,Survival — SIRT3 mitochondrial,sirtuin
+rs4980329,T/T,0.0,neutral,"SIRT3 rs4980329 TT — reference genotype. Standard SIRT3 function.",low,SIRT3,Survival — SIRT3 mitochondrial,sirtuin
+rs107251,C/C,0.3,protective,"SIRT6 rs107251 CC — gene-based analysis showed significant association of SIRT6 variations with longevity across Danish, German, and Dutch cohorts. SIRT6 is involved in DNA double-strand break repair and telomere maintenance.",medium,SIRT6,Longevity — SIRT6 DNA repair,sirtuin
+rs107251,C/T,0.15,protective,"SIRT6 rs107251 CT heterozygous — intermediate effect. SIRT6 gene-level signal was the strongest sirtuin association in the European multi-cohort study.",low,SIRT6,Longevity — SIRT6 DNA repair,sirtuin
+rs107251,T/T,0.0,neutral,"SIRT6 rs107251 TT — reference genotype. Standard SIRT6-mediated DNA repair.",low,SIRT6,Longevity — SIRT6 DNA repair,sirtuin

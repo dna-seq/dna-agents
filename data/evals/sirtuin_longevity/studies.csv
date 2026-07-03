@@ -1,0 +1,14 @@
+rsid,pmid,population,p_value,conclusion,study_design
+rs3758391,20633545,Chinese (Han),,"SIRT1 rs3758391/C and rs4746720/C were more common in centenarians than controls. Genotype distribution showed significant case-control difference.",case-control
+rs3758391,22234866,"Danish, German, Dutch",,"After correcting for multiple testing, no individual SIRT1 SNPs were significantly associated with longevity. Gene-based analysis was suggestive.",case-control
+rs3758391,25305471,Ashkenazi Jewish,,"No association was found between SIRT1 SNPs and longevity in the LonGenity cohort.",case-control
+rs12778366,23505545,Dutch,,"Carriers of the minor C allele of rs12778366 had better glucose tolerance and lower HbA1c in the Leiden Longevity Study offspring.",prospective-cohort
+rs12778366,22234866,"Danish, German, Dutch",,"After correcting for multiple testing, no individual SIRT1 SNPs were significantly associated with longevity.",case-control
+rs12778366,25305471,Ashkenazi Jewish,,"No association was found between SIRT1 SNPs and longevity in the LonGenity cohort.",case-control
+rs7896005,21972126,American (Caucasian),,"SIRT1 rs7896005 had significant effects on telomere length and was associated with longevity-related telomere maintenance.",cross-sectional
+rs7896005,25305471,Ashkenazi Jewish,,"No association was found between SIRT1 SNPs and longevity in the LonGenity cohort.",case-control
+rs4746720,20633545,Chinese (Han),,"SIRT1 rs4746720/C was more common in centenarians. Genotype distribution did not differ significantly when analyzed independently.",case-control
+rs11555236,23839864,Italian (Northern),,"Longitudinal analysis showed an association for rs11555236 in whole-cohort survival analysis. Cross-sectional centenarian vs control comparison was not significant.",longitudinal-cohort
+rs11555236,19367319,European,,"No significant results were observed for SIRT3 variants in the European candidate gene longevity study.",case-control
+rs4980329,23839864,Italian (Northern),,"Longitudinal analysis showed an association for rs4980329 with survival. Cross-sectional centenarian comparison was not significant.",longitudinal-cohort
+rs107251,22234866,"Danish, German, Dutch",,"Gene-based analysis showed a significant association of SIRT6 variations with longevity. This was the strongest sirtuin signal in the multi-cohort study.",case-control
