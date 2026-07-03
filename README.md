@@ -31,6 +31,7 @@ You can use it three ways:
 
 ## Contents
 
+- [Creating modules (guide for non-biologists)](#creating-modules-guide-for-non-biologists)
 - [Use with Claude, Cursor, Codex, Antigravity, or other agents](#use-with-claude-cursor-codex-antigravity-or-other-agents)
 - [Claude Code agents and workflows](#claude-code-agents-and-workflows)
 - [Evals (Quick Play)](#evals-quick-play)
@@ -42,6 +43,35 @@ You can use it three ways:
 - [Ensembl variant resolution](#ensembl-variant-resolution)
 - [Testing](#testing)
 - [Research use only](#research-use-only)
+
+## Creating modules (guide for non-biologists)
+
+You don't need a biology background to create annotation modules — but you do
+need the right kind of source material. Not all genomics papers are suitable:
+
+- **Reviews** summarize other work — they contain no original variant data.
+  Trace back to the original studies they cite.
+- **PRS / polygenic score studies** aggregate thousands of tiny-effect variants
+  into a single score. Use [just-prs](https://github.com/dna-seq/just-prs)
+  for these instead.
+- **Gene expression / epigenetics papers** study RNA or methylation, not DNA
+  variants. No SNPs to extract.
+- **GWAS papers** are often suitable, but the individual SNP data is frequently
+  in **supplementary tables**, not the main text. Always download and attach
+  the supplements.
+
+What works best: **candidate-gene studies**, **pharmacogenomics guidelines**
+(CPIC/DPWG), and **GWAS papers where you also attach the supplementary tables**.
+
+Use the `@paper-scout` agent in Claude Code to search for and classify papers
+before creating a module. It will tell you which papers have extractable SNP
+data and which don't.
+
+For a full guide with paper taxonomy, search strategies, and step-by-step
+workflow, see [docs/module-creation-guide.md](docs/module-creation-guide.md).
+
+For a video walkthrough of the annotation principles (using the just-dna-lite
+UI), see the [YouTube tutorial](https://www.youtube.com/watch?v=81ZKngPbBj0).
 
 ## Use with Claude, Cursor, Codex, Antigravity, or other agents
 
@@ -188,6 +218,7 @@ pre-built agent definitions and a multi-agent workflow are available:
 
 | Agent | Invoke with | Description |
 |-------|-------------|-------------|
+| Paper Scout | `@paper-scout` | Deep-research agent that finds and triages papers suitable for module creation. Classifies papers by type, filters out reviews/PRS/expression-only studies, flags supplementary data. |
 | Module Creator | `@module-creator` | Solo agent that creates a complete module from a paper, variant list, or freeform description. Has access to BioContext KB tools. |
 | Researcher | `@researcher` | Genetics researcher subagent — variant analysis, literature search, genotype assessment |
 | Reviewer | `@reviewer` | Quality reviewer subagent — checks provenance, data integrity, scientific accuracy |

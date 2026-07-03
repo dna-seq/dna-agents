@@ -33,6 +33,9 @@ uv run dna-agents download-papers data/evals/cyp_panel/
 # Score agent output against ground truth
 uv run dna-agents eval candidate_output/ data/evals/cyp_panel/
 
+# Run agent evals (requires claude CLI + subscription)
+uv run pytest tests/test_agent_evals.py -v -m agent_eval --timeout=600
+
 # Start MCP server (stdio)
 uv run dna-agents-mcp serve
 
@@ -46,6 +49,7 @@ This project uses BioContext KB for variant research. Configure in `.mcp.json`.
 
 ## Agent definitions
 
+- `.claude/agents/paper-scout.md` — deep-research agent: finds and triages papers suitable for module creation
 - `.claude/agents/module-creator.md` — solo module creator (single agent, full workflow)
 - `.claude/agents/researcher.md` — genetics researcher subagent (variant analysis)
 - `.claude/agents/reviewer.md` — quality reviewer subagent (error checking)
@@ -54,7 +58,11 @@ This project uses BioContext KB for variant research. Configure in `.mcp.json`.
 
 ## Module creation
 
-Use `@module-creator` for single-agent module creation, or run the
+Use `@paper-scout` first to find suitable papers (especially useful for non-biologists
+who may not know which paper types contain extractable SNP data vs. reviews or PRS studies).
+
+Then use `@module-creator` for single-agent module creation, or run the
 `create-module` workflow for the full PI + researcher team setup.
 
 See `AGENTS.md` for the complete module spec format reference.
+See `docs/module-creation-guide.md` for a human-facing guide on paper selection.
