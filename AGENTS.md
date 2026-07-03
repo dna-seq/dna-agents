@@ -105,17 +105,28 @@ rsid,pmid,population,p_value,conclusion,study_design
 ## Critical Rules
 
 1. **GRCh38 ONLY** — all coordinates must be GRCh38. Never use GRCh37/hg19.
-2. **Compiler auto-resolution** — the compiler resolves rsid -> coordinates and
+2. **Forward-strand alleles ONLY** — ref and alt alleles must be on the
+   forward (plus) strand as reported by Ensembl. Never use reverse-strand
+   complement alleles. If a paper reports C/T but Ensembl shows G/A for
+   that rsid, use G/A.
+3. **Verify ref/alt via Ensembl** — for every rsid, confirm that the ref allele
+   matches the GRCh38 reference genome and that the alt is a known alternate.
+   Genotype alleles must be a subset of {ref, alt}.
+4. **Compiler auto-resolution** — the compiler resolves rsid -> coordinates and
    coordinates -> rsid automatically. You only need ONE of them per variant.
-3. **Epistemic humility** — this is Research Use Only. Use "associated with",
+5. **Epistemic humility** — this is Research Use Only. Use "associated with",
    "may contribute to", "has been linked to". NEVER use "causes", "guarantees",
    "will result in". No individual-level predictions from population data.
-4. **Alleles sorted alphabetically** — A/G not G/A, C/T not T/C.
-5. **Include wild-type** — every variant needs ref/ref genotype with weight 0
+6. **Alleles sorted alphabetically** — A/G not G/A, C/T not T/C.
+7. **Include wild-type** — every variant needs ref/ref genotype with weight 0
    and state "neutral".
-6. **Weight range** — -1.5 to +1.5. Reserve extremes for well-established findings.
-7. **Real PMIDs only** — never invent PMIDs. Use EuropePMC to find them.
-8. **studies.csv is mandatory** — modules without study references are not useful.
+8. **Weight range** — -1.5 to +1.5. Reserve extremes for well-established findings.
+9. **Verify every PMID** — search EuropePMC for each PMID and confirm it exists.
+   Check that the title, authors, and topic match what you expect. You do NOT need
+   the exact rsid in the abstract — just confirm the paper is about the right
+   gene/phenotype. Prefer DOIs when available (resolve via `DOI:<doi>` query).
+   Never invent PMIDs. A missing citation is better than a wrong one.
+10. **studies.csv is mandatory** — modules without study references are not useful.
 
 ## Workflow: Creating a Module
 
@@ -137,9 +148,64 @@ uv run dna-agents validate /path/to/spec/
 # Compile to parquet
 uv run dna-agents compile /path/to/spec/ --output /path/to/output/
 
+# Download papers from EuropePMC for a module's studies.csv
+uv run dna-agents download-papers data/evals/cyp_panel/
+
+# Download HF annotator modules (parquet files)
+uv run dna-agents download-modules
+
+# Download a single module with reverse-compile to spec format
+uv run dna-agents download-modules -m longevitymap --reverse
+
+# List available HF modules
+uv run dna-agents download-modules --list
+
+# Score agent output against local ground truth
+uv run dna-agents eval candidate_output/ data/evals/cyp_panel/
+
+# Score agent output against HF module directly (best for modules on HF)
+uv run dna-agents eval agent_output/ longevitymap --rsids rs3758391,rs107251
+
+# Score against downloaded parquet
+uv run dna-agents eval agent_output/ data/modules/longevitymap/
+
+# Run agent evals (requires claude CLI)
+uv run pytest tests/test_agent_evals.py -v -m agent_eval
+
 # Run MCP server (stdio for Claude Code / Cursor)
 uv run dna-agents-mcp serve --transport stdio
 
 # Run MCP server (HTTP for remote access)
 uv run dna-agents-mcp serve --transport http --port 8000
 ```
+
+## Evaluation System
+
+Agent output is scored against ground truth on 8 weighted dimensions:
+
+| Dimension | Weight | Description |
+|-----------|--------|-------------|
+| variant_recall | 2.0 | Fraction of reference rsids found in candidate |
+| variant_precision | 1.0 | Fraction of candidate rsids that are in reference |
+| genotype_completeness | 1.5 | Fraction of expected genotypes present |
+| weight_accuracy | 1.0 | 1 - MAE of weights for matched genotypes |
+| weight_direction | 1.5 | State (risk/protective/neutral) agreement |
+| pmid_recall | 1.5 | Fraction of reference PMIDs found |
+| pmid_precision | 0.5 | Fraction of candidate PMIDs that are valid |
+| gene_accuracy | 1.0 | Correct gene symbol assignment |
+
+### Ground truth sources
+
+- **HF parquet modules** (preferred): `dna-agents eval output/ longevitymap`
+  loads weights.parquet + annotations.parquet + studies.parquet directly from
+  `just-dna-seq/annotators`. Use `--rsids` to restrict to a subset.
+- **Local parquet**: `dna-agents eval output/ data/modules/longevitymap/`
+- **Spec directory**: `dna-agents eval output/ data/evals/cyp_panel/`
+  for modules not on HF (e.g. pharmacogenomics).
+
+### Eval cases
+
+| Eval | Ground truth | Notes |
+|------|-------------|-------|
+| sirtuin_longevity | HF `longevitymap` (7 rsids) | Sirtuin pathway subset |
+| cyp_panel | Local spec dir | Pharmacogenomics, no HF module yet |

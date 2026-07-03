@@ -37,14 +37,45 @@ coordinates when you have an rsid, or vice versa.
 For each variant:
 1. Record rsid OR GRCh38 coordinates (one is sufficient)
 2. Identify gene symbol and all clinically relevant genotypes (ref/ref, ref/alt, alt/alt)
-3. Assess effect direction and weight magnitude from source material
-4. Collect PMIDs — from attachment first, EuropePMC otherwise (max 3 queries, top 3 results)
+3. Verify ref/alt alleles — see Nucleotide Verification below
+4. Assess effect direction and weight magnitude from source material
+5. Collect PMIDs — from attachment first, EuropePMC otherwise (max 3 queries, top 3 results)
+6. Verify each PMID — see PMID Verification below
+
+## Nucleotide verification (MANDATORY)
+
+Getting alleles wrong is the most dangerous error — it makes the module produce
+wrong genotype interpretations for real patients. You MUST verify:
+
+1. **Ref/alt alleles**: when reporting alleles, confirm them against Ensembl.
+   The ref allele must match the GRCh38 forward-strand reference.
+2. **Forward strand only**: all alleles must be on the forward (plus) strand.
+   Common mistake: reporting complement alleles (C/T instead of G/A) from
+   a paper that used the reverse strand. If a source reports alleles that are
+   the complement of what Ensembl shows, use the Ensembl (forward-strand) alleles.
+3. **Genotype consistency**: genotype alleles must be a subset of {ref, alt}.
+   If ref=G and alt=A, valid genotypes are G/G, A/G, A/A — never C/T, T/C, etc.
+
+## PMID verification (MANDATORY)
+
+Hallucinated PMIDs are unacceptable. For every PMID you report:
+
+1. **Verify existence**: search EuropePMC for the PMID and confirm it returns a result.
+2. **Check title, authors, and topic**: the returned paper's title and authors must
+   match what you expect. A real PMID about Dupuytren's disease or oocyte activation
+   is as bad as a hallucinated one. You do NOT need the exact rsid in the abstract —
+   just confirm the paper is about the right gene/phenotype/topic.
+3. **Prefer DOIs when available**: DOIs are more reliable identifiers than PMIDs.
+   When a source provides a DOI, resolve it to a PMID via EuropePMC search
+   (`DOI:<doi>` query). This avoids digit-transposition errors.
+4. **Never guess PMIDs**: if you cannot verify a PMID, omit the study row entirely.
+   A missing citation is better than a wrong one.
 
 ## Tool discipline
 
 - **Open Targets**: ONLY for disease association strength. NEVER for coordinate or allele lookups
-- **Ensembl**: ONLY to verify an rsid exists or confirm a gene symbol. NOT for coordinate lookups
-- **EuropePMC**: for PMIDs not in attached material; abstract-level is sufficient
+- **Ensembl**: to verify rsid existence, confirm gene symbol, and CHECK ref/alt alleles on forward strand
+- **EuropePMC**: for PMIDs not in attached material; verify every PMID you report
 - **Skip UniProt and STRING** unless explicitly needed
 
 ## Conclusion language

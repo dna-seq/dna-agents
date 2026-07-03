@@ -251,6 +251,103 @@ def download_papers_cmd(
     console.print(f"\n[bold]{success}/{len(results)}[/bold] metadata, [bold]{fulltext}[/bold] full text\n")
 
 
+@app.command("download-modules")
+def download_modules_cmd(
+    output: Path = typer.Option(
+        "data/modules",
+        "--output", "-o",
+        help="Output directory for downloaded parquet files.",
+    ),
+    module: Optional[str] = typer.Option(
+        None,
+        "--module", "-m",
+        help="Download a single module by name. Default: download all.",
+    ),
+    reverse: bool = typer.Option(
+        False,
+        "--reverse/--no-reverse",
+        help="Also reverse-compile parquet to module spec format (YAML + CSV).",
+    ),
+    spec_output: Optional[Path] = typer.Option(
+        None,
+        "--spec-output",
+        help="Output dir for reversed specs. Default: <output>/<name>_spec/",
+    ),
+    discover: bool = typer.Option(
+        False,
+        "--discover",
+        help="Dynamically discover available modules from HuggingFace (requires huggingface_hub).",
+    ),
+    list_modules: bool = typer.Option(
+        False,
+        "--list",
+        help="List available modules and exit.",
+    ),
+) -> None:
+    """
+    Download annotator module parquet files from HuggingFace.
+
+    Downloads weights, annotations, and studies parquet files from the
+    just-dna-seq/annotators dataset. Optionally reverse-compiles them
+    to module spec format (module_spec.yaml + variants.csv + studies.csv)
+    for use as eval ground truth.
+
+    Examples:
+
+        dna-agents download-modules --list
+
+        dna-agents download-modules
+
+        dna-agents download-modules -m longevitymap --reverse
+
+        dna-agents download-modules --reverse --spec-output data/ground_truth/
+    """
+    from dna_agents.modules import (
+        discover_modules,
+        download_all_modules,
+        download_module,
+        list_available_modules,
+    )
+
+    if list_modules:
+        if discover:
+            console.print("[bold]Discovering modules from HuggingFace...[/bold]")
+            modules = discover_modules()
+        else:
+            modules = list_available_modules()
+        console.print(f"\n[bold]Available modules ({len(modules)}):[/bold]")
+        for m in modules:
+            console.print(f"  {m}")
+        console.print()
+        return
+
+    console.print(f"\n[bold]Output:[/bold] {output}")
+    if reverse:
+        console.print(f"[bold]Spec output:[/bold] {spec_output or '<auto>'}")
+    console.print()
+
+    if module:
+        results = [download_module(module, output, reverse=reverse, spec_output_dir=spec_output)]
+    else:
+        results = download_all_modules(output, reverse=reverse, spec_output_dir=spec_output)
+
+    table = Table(title="Module Downloads")
+    table.add_column("Module", style="cyan")
+    table.add_column("Files", style="green")
+    table.add_column("Reversed", style="green")
+    table.add_column("Status", style="bold")
+
+    for r in results:
+        status = "[green]OK" if r.success else f"[red]{r.error}"
+        files = ", ".join(r.files_downloaded) if r.files_downloaded else "[dim]none"
+        reversed_col = f"[green]{r.spec_dir}" if r.spec_dir else "[dim]no"
+        table.add_row(r.name, files, reversed_col, status)
+
+    console.print(table)
+    success = sum(1 for r in results if r.success)
+    console.print(f"\n[bold]{success}/{len(results)}[/bold] modules downloaded\n")
+
+
 @app.command("eval")
 def eval_cmd(
     candidate_dir: Path = typer.Argument(
@@ -260,33 +357,48 @@ def eval_cmd(
         file_okay=False,
         dir_okay=True,
     ),
-    reference_dir: Path = typer.Argument(
+    reference: str = typer.Argument(
         ...,
-        help="Path to reference (ground truth) module spec directory.",
-        exists=True,
-        file_okay=False,
-        dir_okay=True,
+        help="Ground truth: spec dir path, parquet dir path, or HF module name (e.g. 'longevitymap').",
+    ),
+    rsid_filter: Optional[str] = typer.Option(
+        None,
+        "--rsids",
+        help="Comma-separated rsids to restrict scoring to (e.g. 'rs3758391,rs107251').",
     ),
 ) -> None:
     """
     Score a candidate module spec against a reference ground truth.
 
-    Compares variants.csv and studies.csv on multiple dimensions:
-    variant recall/precision, genotype completeness, weight accuracy,
-    weight direction, PMID recall/precision, gene accuracy.
+    Reference can be a spec directory (variants.csv), a parquet directory
+    (weights.parquet), or an HF module name loaded directly from
+    just-dna-seq/annotators.
+
+    Compares on multiple dimensions: variant recall/precision, genotype
+    completeness, weight accuracy, weight direction, PMID recall/precision,
+    gene accuracy.
 
     Examples:
 
-        dna-agents eval module_output/cyp_drug_metabolism/ data/evals/cyp_panel/
+        dna-agents eval agent_output/ data/evals/cyp_panel/
 
-        dna-agents eval agent_output/ tests/fixtures/evals/cyp_panel/
+        dna-agents eval agent_output/ longevitymap --rsids rs3758391,rs107251
+
+        dna-agents eval agent_output/ data/modules/longevitymap/
     """
     from dna_agents.eval_scorer import score_module
 
-    console.print(f"\n[bold]Candidate:[/bold] {candidate_dir}")
-    console.print(f"[bold]Reference:[/bold] {reference_dir}\n")
+    rsids = None
+    if rsid_filter:
+        rsids = {r.strip() for r in rsid_filter.split(",") if r.strip()}
 
-    result = score_module(candidate_dir, reference_dir)
+    console.print(f"\n[bold]Candidate:[/bold] {candidate_dir}")
+    console.print(f"[bold]Reference:[/bold] {reference}")
+    if rsids:
+        console.print(f"[bold]RSIDs:    [/bold] {', '.join(sorted(rsids))}")
+    console.print()
+
+    result = score_module(candidate_dir, reference, rsid_filter=rsids)
 
     table = Table(title="Evaluation Score")
     table.add_column("Dimension", style="cyan")

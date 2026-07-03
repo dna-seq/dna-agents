@@ -7,7 +7,6 @@ import pytest
 
 from dna_agents.eval_scorer import score_module
 
-
 EVALS_DIR = Path(__file__).parent.parent / "data" / "evals"
 
 
@@ -37,33 +36,29 @@ class TestEvalScorerPartialMatch:
 
     @pytest.fixture
     def partial_candidate(self, tmp_path):
-        """Create a candidate with only 3 of 7 CYP variants, one wrong weight."""
+        """Create a candidate with only 2 of 7 CYP variants, one wrong weight."""
         ref = EVALS_DIR / "cyp_panel"
 
         cand_dir = tmp_path / "candidate"
         cand_dir.mkdir()
 
-        # Copy only first 3 variants (rs4244285 has 3 genotype rows)
         with open(ref / "variants.csv", encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             fieldnames = reader.fieldnames
             rows = list(reader)
 
-        # Keep only rs4244285 and rs4986893 (6 rows), skip the rest
         kept_rsids = {"rs4244285", "rs4986893"}
         kept_rows = [r for r in rows if r["rsid"] in kept_rsids]
 
-        # Flip one weight to test weight accuracy
         for r in kept_rows:
             if r["rsid"] == "rs4244285" and r["genotype"] == "A/A":
-                r["weight"] = "-1.0"  # was -1.5
+                r["weight"] = "-1.0"
 
         with open(cand_dir / "variants.csv", "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(kept_rows)
 
-        # Copy only some studies
         with open(ref / "studies.csv", encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             study_fields = reader.fieldnames
@@ -79,7 +74,6 @@ class TestEvalScorerPartialMatch:
     def test_partial_variant_recall(self, partial_candidate):
         ref = EVALS_DIR / "cyp_panel"
         result = score_module(partial_candidate, ref)
-        # 2 of 7 rsids found
         assert result.variant_recall.score == 2.0
         assert result.variant_recall.max_score == 7.0
         assert result.variant_recall.normalized == pytest.approx(2 / 7, abs=0.01)
@@ -87,13 +81,11 @@ class TestEvalScorerPartialMatch:
     def test_partial_precision_is_perfect(self, partial_candidate):
         ref = EVALS_DIR / "cyp_panel"
         result = score_module(partial_candidate, ref)
-        # All candidate rsids are in reference
         assert result.variant_precision.normalized == 1.0
 
     def test_partial_weight_accuracy(self, partial_candidate):
         ref = EVALS_DIR / "cyp_panel"
         result = score_module(partial_candidate, ref)
-        # Weight accuracy should be less than perfect (one weight is off by 0.5)
         assert result.weight_accuracy.normalized < 1.0
         assert result.weight_accuracy.normalized > 0.5
 
@@ -143,7 +135,6 @@ class TestEvalScorerExtraVariants:
         cand = tmp_path / "extra"
         cand.mkdir()
 
-        # Copy all reference variants plus add a fake one
         with open(ref / "variants.csv", encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             fieldnames = reader.fieldnames
@@ -163,3 +154,54 @@ class TestEvalScorerExtraVariants:
         assert result.variant_recall.normalized == 1.0
         assert result.variant_precision.normalized < 1.0
         assert "rs999999" in result.variant_precision.details[0]
+
+
+class TestEvalScorerRsidFilter:
+    """Test rsid_filter restricts scoring to subset of variants."""
+
+    def test_rsid_filter(self):
+        ref = EVALS_DIR / "cyp_panel"
+        rsids = {"rs4244285", "rs4986893"}
+        result = score_module(ref, ref, rsid_filter=rsids)
+        assert result.variant_recall.max_score == 2.0
+        assert result.variant_recall.normalized == 1.0
+        assert result.overall == pytest.approx(1.0, abs=0.01)
+
+
+@pytest.mark.integration
+class TestEvalScorerParquet:
+    """Test scoring against parquet directories and HF modules."""
+
+    def test_score_against_downloaded_parquet(self, tmp_path):
+        """Download a module, reverse it, and score the reversed spec against itself."""
+        from dna_agents.modules import download_module
+
+        result = download_module("longevitymap", tmp_path / "parquet")
+        if not result.success:
+            pytest.skip(f"Could not download longevitymap: {result.error}")
+
+        from dna_agents.compiler import reverse_module
+        spec_dir = tmp_path / "spec"
+        reverse_module(result.parquet_dir, spec_dir, module_name="longevitymap")
+
+        sirtuin_rsids = {"rs3758391", "rs107251"}
+        score = score_module(spec_dir, result.parquet_dir, rsid_filter=sirtuin_rsids)
+        assert score.variant_recall.normalized == 1.0
+        assert score.overall == pytest.approx(1.0, abs=0.01)
+
+    def test_score_against_hf_module(self, tmp_path):
+        """Score a reversed spec against HF module directly."""
+        from dna_agents.modules import download_module
+        from dna_agents.compiler import reverse_module
+
+        result = download_module("longevitymap", tmp_path / "parquet")
+        if not result.success:
+            pytest.skip(f"Could not download longevitymap: {result.error}")
+
+        spec_dir = tmp_path / "spec"
+        reverse_module(result.parquet_dir, spec_dir, module_name="longevitymap")
+
+        sirtuin_rsids = {"rs3758391", "rs107251"}
+        score = score_module(spec_dir, "longevitymap", rsid_filter=sirtuin_rsids)
+        assert score.variant_recall.normalized == 1.0
+        assert score.overall == pytest.approx(1.0, abs=0.01)

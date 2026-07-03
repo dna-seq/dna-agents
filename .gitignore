@@ -217,6 +217,12 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# Downloaded papers (metadata + full text from EuropePMC)
+data/papers/
+
+# Downloaded HF module parquet files
+data/modules/
+
 # Claude Code — ignore personal settings, commit shared agent definitions
 .claude/settings.json
 .claude/settings.local.json

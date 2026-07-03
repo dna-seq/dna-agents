@@ -41,6 +41,24 @@ The compiler resolves missing identifiers automatically:
 - Is each variant represented with all relevant genotypes (ref/ref, ref/alt, alt/alt)?
 - Is wild-type included with weight 0 and state "neutral"?
 
+## Nucleotide Verification (CRITICAL — check every variant)
+
+Wrong alleles are the most dangerous error. For EACH rsid, verify via Ensembl:
+
+1. **rsid exists** — look up the rsid in Ensembl. Flag ERROR if not found.
+2. **Ref allele correct** — the ref allele in the CSV must match Ensembl's
+   GRCh38 forward-strand reference. Flag ERROR if it doesn't.
+3. **Alt allele valid** — the alt allele must be a known alternate for that rsid
+   in Ensembl. Flag ERROR if it's not.
+4. **Forward strand** — all alleles must be forward-strand. Common mistake:
+   complement alleles (C/T instead of G/A). If you see alleles that are the
+   complement of Ensembl's, flag ERROR "strand flip — eval uses reverse strand,
+   must use forward strand".
+5. **Genotype alleles subset of {ref, alt}** — every allele in every genotype
+   must be either the ref or an alt allele. Flag ERROR for impossible alleles.
+6. **Position if provided** — if chrom/start are given, verify they match
+   Ensembl's GRCh38 mapping for that rsid. Flag ERROR if off by >1 bp.
+
 ## Weight & State Consistency
 - Negative=risk, positive=protective, 0=neutral?
 - Magnitudes reasonable (0.1-0.3 weak, 0.4-0.8 moderate, 0.9-1.2 strong)?
@@ -48,8 +66,25 @@ The compiler resolves missing identifiers automatically:
 
 ## Scientific Accuracy
 - Conclusions factual and consistent with cited evidence?
-- PMIDs correspond to real publications? (spot-check via search)
 - Gene symbols correct HGNC symbols?
+
+## PMID Verification (MANDATORY — check every PMID)
+
+Every PMID in studies.csv must be verified. Do NOT spot-check — check ALL:
+
+1. **Exists in PubMed/EuropePMC** — search for each PMID. Flag ERROR if not found.
+2. **Title, authors, and topic match** — look up each PMID and confirm the paper's
+   title and authors are what you expect, and the topic is relevant to the
+   gene/phenotype being cited. You do NOT need the exact rsid in the abstract —
+   just confirm it's the right paper about the right topic. Flag ERROR with the
+   actual paper title if it's clearly unrelated.
+3. **DOI cross-check** — if the module provides DOIs, verify they resolve to the
+   expected PMID. DOIs are more reliable than PMIDs for catching transposition errors.
+
+Common failure mode: LLMs generate plausible-looking 8-digit PMIDs that either
+don't exist or point to completely unrelated papers (oocyte studies, Dupuytren's
+disease, etc.). This has been observed in practice. The fix is simple: search each
+PMID, read the title — if the title is about a different topic, it's wrong.
 
 ## Conclusion Language — Epistemic Humility
 

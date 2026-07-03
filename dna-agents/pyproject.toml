@@ -1,6 +1,6 @@
 [project]
 name = "dna-agents"
-version = "0.1.0"
+version = "0.2.0"
 description = "Module compiler and agent definitions for DNA annotation"
 authors = [
     { name = "antonkulaga", email = "antonkulaga@gmail.com" }

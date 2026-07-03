@@ -114,8 +114,8 @@ rsid,pmid,population,p_value,conclusion,study_design
 ## BioContext KB Tools
 
 You have access to BioContext KB via MCP for variant research:
-- **Ensembl** — verify rsids, variant positions (GRCh38 only)
-- **EuropePMC** — find real PMIDs (never invent them)
+- **Ensembl** — verify rsids, check ref/alt alleles on forward strand (GRCh38 only)
+- **EuropePMC** — find and VERIFY real PMIDs (never invent them)
 - **Open Targets** — disease association strength (NOT for coordinate lookups)
 - **UniProt, Reactome, KEGG** — gene function and pathways (use sparingly)
 
@@ -126,6 +126,35 @@ You have access to BioContext KB via MCP for variant research:
 - The compiler auto-resolves rsid <-> GRCh38 coordinates. Do NOT look up
   coordinates when you have an rsid, or vice versa
 - Avoid UniProt and STRING unless absolutely necessary (large responses)
+
+## Nucleotide Verification (MANDATORY)
+
+Wrong alleles make the module produce incorrect genotype interpretations. You MUST:
+
+1. **Verify ref/alt alleles via Ensembl** for every rsid. The ref allele must match
+   the GRCh38 forward-strand reference genome.
+2. **Use forward strand only**. Papers sometimes report reverse-strand alleles
+   (C/T instead of G/A). Always use the Ensembl forward-strand convention.
+   If a source gives complement alleles, convert them.
+3. **Genotype alleles must be a subset of {ref, alt}**. If Ensembl says
+   ref=G alt=A, valid genotypes are G/G, A/G, A/A — never C/T or T/C.
+4. **Positions if provided must be GRCh38**. The compiler auto-resolves,
+   but if you manually include coordinates, verify them against Ensembl.
+
+## PMID Verification (MANDATORY)
+
+1. **Search EuropePMC for every PMID** you include. Confirm it returns a result.
+2. **Check title, authors, and topic**: look up each PMID and verify the paper's
+   title and authors match what you expect. The topic must be relevant to the
+   gene/phenotype being cited — a PMID about oocyte activation is useless for
+   CYP2C19. You do NOT need the exact rsid in the abstract.
+3. **Prefer DOIs when available**: DOIs are more reliable. When a source provides
+   a DOI, resolve it to a PMID via EuropePMC (`DOI:<doi>` query).
+4. **Never guess PMIDs**. If you cannot verify a PMID, omit the study row.
+   A missing citation is better than a wrong one.
+5. **Extract PMIDs from input papers first**. When the user provides papers,
+   use the PMIDs from those papers as the primary source. Only search
+   EuropePMC for additional citations.
 
 ## Workflow
 
@@ -157,6 +186,8 @@ This is Research Use Only. All conclusions must use cautious language:
 
 1. GRCh38 ONLY — never include GRCh37/hg19 coordinates
 2. Real rsids only — never invent them
-3. Compiler auto-resolves identifiers — you only need rsid OR coordinates
-4. studies.csv is mandatory — modules without references are not useful
-5. Proper CSV quoting for fields containing commas
+3. Forward-strand alleles ONLY — verify against Ensembl, never use complement
+4. Verify every PMID via EuropePMC — never guess or invent PMIDs
+5. Compiler auto-resolves identifiers — you only need rsid OR coordinates
+6. studies.csv is mandatory — modules without references are not useful
+7. Proper CSV quoting for fields containing commas

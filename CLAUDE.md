@@ -24,17 +24,29 @@ uv run pytest -m "not integration"
 # Validate a module spec
 uv run dna-agents validate /path/to/spec/
 
-# Compile a module
+# Compile a module (auto-resolves rsid <-> GRCh38 coordinates via Ensembl DuckDB)
 uv run dna-agents compile /path/to/spec/ -o /path/to/output/
 
 # Download papers from EuropePMC for a module's studies.csv
 uv run dna-agents download-papers data/evals/cyp_panel/
 
-# Score agent output against ground truth
+# Download HF annotator modules (parquet files)
+uv run dna-agents download-modules
+
+# Download a single module with reverse-compile to spec format
+uv run dna-agents download-modules -m longevitymap --reverse
+
+# List available HF modules
+uv run dna-agents download-modules --list
+
+# Score agent output against local ground truth
 uv run dna-agents eval candidate_output/ data/evals/cyp_panel/
 
-# Run agent evals (requires claude CLI + subscription)
-uv run pytest tests/test_agent_evals.py -v -m agent_eval --timeout=600
+# Score against HF module directly (preferred for modules on HF)
+uv run dna-agents eval agent_output/ longevitymap --rsids rs3758391,rs107251
+
+# Run agent evals (requires claude CLI)
+uv run pytest tests/test_agent_evals.py -v -m agent_eval
 
 # Start MCP server (stdio)
 uv run dna-agents-mcp serve
@@ -42,6 +54,26 @@ uv run dna-agents-mcp serve
 # Start MCP server (HTTP)
 uv run dna-agents-mcp serve --transport http --port 8000
 ```
+
+## Critical rules
+
+1. **GRCh38 ONLY** — all coordinates must be GRCh38. Never use GRCh37/hg19.
+2. **Forward-strand alleles ONLY** — ref and alt alleles must match Ensembl's
+   forward-strand convention. Never use reverse-strand complement alleles.
+3. **Verify ref/alt via Ensembl** — for every rsid, confirm that the ref allele
+   matches the GRCh38 reference genome and the alt is a known alternate.
+   Genotype alleles must be a subset of {ref, alt}.
+4. **Compiler auto-resolution** — the compiler resolves rsid -> coordinates and
+   coordinates -> rsid automatically. You only need ONE of them per variant.
+5. **Epistemic humility** — Research Use Only. Use "associated with",
+   "may contribute to", "has been linked to". NEVER "causes", "guarantees".
+6. **Alleles sorted alphabetically** — A/G not G/A, C/T not T/C.
+7. **Include wild-type** — every variant needs ref/ref genotype with weight 0.
+8. **Weight range** — -1.5 to +1.5.
+9. **Verify every PMID** — search EuropePMC for each PMID. Confirm it exists AND
+   check that the title, authors, and topic match the variant/gene being cited.
+   Never invent PMIDs. A missing citation is better than a wrong one.
+10. **studies.csv is mandatory** — modules without study references are not useful.
 
 ## MCP servers
 
@@ -55,6 +87,14 @@ This project uses BioContext KB for variant research. Configure in `.mcp.json`.
 - `.claude/agents/reviewer.md` — quality reviewer subagent (error checking)
 - `.claude/workflows/create-module.js` — multi-agent orchestration (PI + researchers + reviewer)
 - `.claude/workflows/eval-module.js` — evaluate create-module against ground truth evals
+
+## Ground truth & evals
+
+- Deployed HF modules at `just-dna-seq/annotators` are the source of truth for alleles
+- Use `download-modules --reverse` to generate eval ground truth from deployed parquet
+- Ensembl DuckDB cache at `~/.cache/just-dna-pipelines/ensembl_variations/` for rsid verification
+- Downloaded papers go to `data/papers/` (gitignored)
+- Downloaded module parquet files go to `data/modules/` (gitignored)
 
 ## Module creation
 

@@ -1,6 +1,11 @@
 """
 Evaluation scorer for comparing agent-produced modules against ground truth.
 
+Ground truth can be:
+    - A module spec directory (variants.csv + studies.csv)
+    - A compiled parquet directory (weights.parquet + studies.parquet)
+    - An HF module name (loaded directly from just-dna-seq/annotators)
+
 Scores agent output on multiple dimensions:
     - Variant recall / precision (rsid coverage)
     - Genotype completeness (all expected genotypes present)
@@ -10,7 +15,7 @@ Scores agent output on multiple dimensions:
     - Gene assignment accuracy
 
 Public API:
-    score_module(candidate_dir, reference_dir) -> EvalScore
+    score_module(candidate_dir, reference, rsid_filter=None) -> EvalScore
 """
 
 import csv
@@ -100,7 +105,7 @@ class EvalScore:
         }
 
 
-def _load_variants(spec_dir: Path) -> dict[str, list[dict]]:
+def _load_variants_csv(spec_dir: Path) -> dict[str, list[dict]]:
     """Load variants.csv, grouped by rsid."""
     path = spec_dir / "variants.csv"
     if not path.exists():
@@ -115,7 +120,7 @@ def _load_variants(spec_dir: Path) -> dict[str, list[dict]]:
     return by_rsid
 
 
-def _load_studies(spec_dir: Path) -> dict[str, set[str]]:
+def _load_studies_csv(spec_dir: Path) -> dict[str, set[str]]:
     """Load studies.csv, returning {rsid: set of pmids}."""
     path = spec_dir / "studies.csv"
     if not path.exists():
@@ -131,28 +136,223 @@ def _load_studies(spec_dir: Path) -> dict[str, set[str]]:
     return by_rsid
 
 
+def _load_variants_parquet(
+    parquet_dir: Path,
+    rsid_filter: Optional[set[str]] = None,
+) -> dict[str, list[dict]]:
+    """Load variants from parquet (weights + annotations), grouped by rsid."""
+    import polars as pl
+
+    weights_path = parquet_dir / "weights.parquet"
+    if not weights_path.exists():
+        return {}
+
+    wdf = pl.read_parquet(weights_path)
+    if rsid_filter:
+        wdf = wdf.filter(pl.col("rsid").is_in(list(rsid_filter)))
+
+    ann_lookup: dict[str, dict] = {}
+    ann_path = parquet_dir / "annotations.parquet"
+    if ann_path.exists():
+        adf = pl.read_parquet(ann_path)
+        if rsid_filter:
+            adf = adf.filter(pl.col("rsid").is_in(list(rsid_filter)))
+        for row in adf.iter_rows(named=True):
+            ann_lookup[row["rsid"]] = {
+                "gene": row.get("gene", ""),
+                "phenotype": row.get("phenotype", ""),
+                "category": row.get("category", ""),
+            }
+
+    by_rsid: dict[str, list[dict]] = {}
+    for row in wdf.iter_rows(named=True):
+        rsid = row.get("rsid", "")
+        if not rsid:
+            continue
+        genotype_raw = row.get("genotype")
+        if isinstance(genotype_raw, list):
+            genotype = "/".join(sorted(genotype_raw))
+        else:
+            genotype = str(genotype_raw) if genotype_raw else ""
+
+        ann = ann_lookup.get(rsid, {})
+        entry = {
+            "rsid": rsid,
+            "genotype": genotype,
+            "weight": str(row.get("weight", 0)),
+            "state": row.get("state", ""),
+            "conclusion": row.get("conclusion", ""),
+            "gene": ann.get("gene", row.get("gene", "")),
+            "phenotype": ann.get("phenotype", row.get("phenotype", "")),
+            "category": ann.get("category", row.get("category", "")),
+        }
+        by_rsid.setdefault(rsid, []).append(entry)
+
+    return by_rsid
+
+
+def _load_studies_parquet(
+    parquet_dir: Path,
+    rsid_filter: Optional[set[str]] = None,
+) -> dict[str, set[str]]:
+    """Load studies from parquet, returning {rsid: set of pmids}."""
+    import polars as pl
+
+    path = parquet_dir / "studies.parquet"
+    if not path.exists():
+        return {}
+
+    sdf = pl.read_parquet(path)
+    if rsid_filter:
+        sdf = sdf.filter(pl.col("rsid").is_in(list(rsid_filter)))
+
+    by_rsid: dict[str, set[str]] = {}
+    for row in sdf.iter_rows(named=True):
+        rsid = (row.get("rsid") or "").strip()
+        pmid = str(row.get("pmid", "")).strip()
+        if rsid and pmid:
+            by_rsid.setdefault(rsid, set()).add(pmid)
+    return by_rsid
+
+
+def _load_from_hf(
+    module_name: str,
+    rsid_filter: Optional[set[str]] = None,
+) -> tuple[dict[str, list[dict]], dict[str, set[str]]]:
+    """Load variants and studies directly from HF parquet."""
+    import polars as pl
+
+    hf_prefix = f"hf://datasets/just-dna-seq/annotators/data/{module_name}"
+
+    wdf = pl.read_parquet(f"{hf_prefix}/weights.parquet")
+    if rsid_filter:
+        wdf = wdf.filter(pl.col("rsid").is_in(list(rsid_filter)))
+
+    ann_lookup: dict[str, dict] = {}
+    try:
+        adf = pl.read_parquet(f"{hf_prefix}/annotations.parquet")
+        if rsid_filter:
+            adf = adf.filter(pl.col("rsid").is_in(list(rsid_filter)))
+        for row in adf.iter_rows(named=True):
+            ann_lookup[row["rsid"]] = {
+                "gene": row.get("gene", ""),
+                "phenotype": row.get("phenotype", ""),
+                "category": row.get("category", ""),
+            }
+    except Exception:
+        pass
+
+    by_rsid: dict[str, list[dict]] = {}
+    for row in wdf.iter_rows(named=True):
+        rsid = row.get("rsid", "")
+        if not rsid:
+            continue
+        genotype_raw = row.get("genotype")
+        if isinstance(genotype_raw, list):
+            genotype = "/".join(sorted(genotype_raw))
+        else:
+            genotype = str(genotype_raw) if genotype_raw else ""
+
+        ann = ann_lookup.get(rsid, {})
+        entry = {
+            "rsid": rsid,
+            "genotype": genotype,
+            "weight": str(row.get("weight", 0)),
+            "state": row.get("state", ""),
+            "conclusion": row.get("conclusion", ""),
+            "gene": ann.get("gene", row.get("gene", "")),
+            "phenotype": ann.get("phenotype", row.get("phenotype", "")),
+            "category": ann.get("category", row.get("category", "")),
+        }
+        by_rsid.setdefault(rsid, []).append(entry)
+
+    studies: dict[str, set[str]] = {}
+    try:
+        sdf = pl.read_parquet(f"{hf_prefix}/studies.parquet")
+        if rsid_filter:
+            sdf = sdf.filter(pl.col("rsid").is_in(list(rsid_filter)))
+        for row in sdf.iter_rows(named=True):
+            rsid = (row.get("rsid") or "").strip()
+            pmid = str(row.get("pmid", "")).strip()
+            if rsid and pmid:
+                studies.setdefault(rsid, set()).add(pmid)
+    except Exception:
+        pass
+
+    return by_rsid, studies
+
+
+def _load_reference(
+    reference: Path | str,
+    rsid_filter: Optional[set[str]] = None,
+) -> tuple[dict[str, list[dict]], dict[str, set[str]]]:
+    """
+    Load reference data from any supported source.
+
+    Args:
+        reference: One of:
+            - Path to a spec dir (variants.csv)
+            - Path to a parquet dir (weights.parquet)
+            - HF module name string (e.g. "longevitymap")
+        rsid_filter: Optional set of rsids to restrict to.
+    """
+    ref = str(reference)
+
+    # HF module name (no slashes, no file extension)
+    if "/" not in ref and "." not in ref and not Path(ref).exists():
+        return _load_from_hf(ref, rsid_filter)
+
+    ref_path = Path(ref)
+
+    # Parquet directory
+    if (ref_path / "weights.parquet").exists():
+        variants = _load_variants_parquet(ref_path, rsid_filter)
+        studies = _load_studies_parquet(ref_path, rsid_filter)
+        if rsid_filter:
+            variants = {k: v for k, v in variants.items() if k in rsid_filter}
+            studies = {k: v for k, v in studies.items() if k in rsid_filter}
+        return variants, studies
+
+    # CSV spec directory
+    variants = _load_variants_csv(ref_path)
+    studies = _load_studies_csv(ref_path)
+    if rsid_filter:
+        variants = {k: v for k, v in variants.items() if k in rsid_filter}
+        studies = {k: v for k, v in studies.items() if k in rsid_filter}
+    return variants, studies
+
+
 def _all_pmids(studies: dict[str, set[str]]) -> set[str]:
     return {pmid for pmids in studies.values() for pmid in pmids}
 
 
-def score_module(candidate_dir: Path, reference_dir: Path) -> EvalScore:
+def score_module(
+    candidate_dir: Path,
+    reference: Path | str,
+    rsid_filter: Optional[set[str]] = None,
+) -> EvalScore:
     """
     Score a candidate module spec directory against a reference (ground truth).
 
-    Both directories should contain variants.csv and optionally studies.csv.
+    Args:
+        candidate_dir: Path to candidate spec dir (variants.csv + studies.csv).
+        reference: Ground truth source — spec dir, parquet dir, or HF module name.
+        rsid_filter: Optional set of rsids to restrict scoring to.
     """
     candidate_dir = Path(candidate_dir)
-    reference_dir = Path(reference_dir)
 
-    ref_variants = _load_variants(reference_dir)
-    cand_variants = _load_variants(candidate_dir)
-    ref_studies = _load_studies(reference_dir)
-    cand_studies = _load_studies(candidate_dir)
+    ref_variants, ref_studies = _load_reference(reference, rsid_filter)
+    cand_variants = _load_variants_csv(candidate_dir)
+    cand_studies = _load_studies_csv(candidate_dir)
+
+    if rsid_filter:
+        cand_variants = {k: v for k, v in cand_variants.items() if k in rsid_filter}
+        cand_studies = {k: v for k, v in cand_studies.items() if k in rsid_filter}
 
     ref_rsids = set(ref_variants.keys())
     cand_rsids = set(cand_variants.keys())
 
-    # ── Variant recall ──
+    # -- Variant recall --
     found = ref_rsids & cand_rsids
     missing = ref_rsids - cand_rsids
     recall_details = []
@@ -165,7 +365,7 @@ def score_module(candidate_dir: Path, reference_dir: Path) -> EvalScore:
         details=recall_details,
     )
 
-    # ── Variant precision ──
+    # -- Variant precision --
     extra = cand_rsids - ref_rsids
     precision_details = []
     if extra:
@@ -177,7 +377,7 @@ def score_module(candidate_dir: Path, reference_dir: Path) -> EvalScore:
         details=precision_details,
     )
 
-    # ── Genotype completeness ──
+    # -- Genotype completeness --
     total_expected = 0
     total_found = 0
     geno_details = []
@@ -198,7 +398,7 @@ def score_module(candidate_dir: Path, reference_dir: Path) -> EvalScore:
         details=geno_details,
     )
 
-    # ── Weight accuracy (MAE for matched genotypes) ──
+    # -- Weight accuracy (MAE for matched genotypes) --
     weight_errors: list[float] = []
     weight_details: list[str] = []
     for rsid in found:
@@ -228,7 +428,7 @@ def score_module(candidate_dir: Path, reference_dir: Path) -> EvalScore:
         details=weight_details,
     )
 
-    # ── Weight direction (state agreement) ──
+    # -- Weight direction (state agreement) --
     total_state_checks = 0
     state_matches = 0
     direction_details: list[str] = []
@@ -254,7 +454,7 @@ def score_module(candidate_dir: Path, reference_dir: Path) -> EvalScore:
         details=direction_details,
     )
 
-    # ── PMID recall ──
+    # -- PMID recall --
     ref_pmids = _all_pmids(ref_studies)
     cand_pmids = _all_pmids(cand_studies)
     found_pmids = ref_pmids & cand_pmids
@@ -270,7 +470,7 @@ def score_module(candidate_dir: Path, reference_dir: Path) -> EvalScore:
         details=pmid_recall_details,
     )
 
-    # ── PMID precision ──
+    # -- PMID precision --
     extra_pmids = cand_pmids - ref_pmids
     pmid_prec_details = []
     if extra_pmids:
@@ -283,7 +483,7 @@ def score_module(candidate_dir: Path, reference_dir: Path) -> EvalScore:
         details=pmid_prec_details,
     )
 
-    # ── Gene accuracy ──
+    # -- Gene accuracy --
     total_gene_checks = 0
     gene_matches = 0
     gene_details: list[str] = []

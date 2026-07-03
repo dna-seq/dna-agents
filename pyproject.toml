@@ -26,4 +26,5 @@ dev = [
 [tool.pytest.ini_options]
 markers = [
     "integration: tests requiring external resources (Ensembl DuckDB, HuggingFace, API keys)",
+    "agent_eval: agent evaluation tests requiring claude CLI and Claude Code subscription",
 ]
