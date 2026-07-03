@@ -184,6 +184,127 @@ def compile_cmd(
         raise typer.Exit(1)
 
 
+@app.command("download-papers")
+def download_papers_cmd(
+    spec_dir: Path = typer.Argument(
+        ...,
+        help="Path to module spec directory containing studies.csv.",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output", "-o",
+        help="Output directory for downloaded papers. Default: data/papers/<spec_name>/",
+    ),
+    no_fulltext: bool = typer.Option(
+        False,
+        "--no-fulltext",
+        help="Skip downloading full text XML, only fetch metadata.",
+    ),
+) -> None:
+    """
+    Download papers referenced in a module spec's studies.csv.
+
+    Fetches metadata and open-access full text from EuropePMC for all
+    PMIDs found in studies.csv. Papers are saved as JSON (metadata)
+    and XML (full text, when available).
+
+    Examples:
+
+        dna-agents download-papers data/evals/cyp_panel/
+
+        dna-agents download-papers data/evals/sirtuin_longevity/ -o papers/sirtuin/
+    """
+    from dna_agents.papers import download_papers, extract_pmids
+
+    pmids = extract_pmids(spec_dir)
+    if not pmids:
+        console.print("[yellow]No PMIDs found in studies.csv[/yellow]")
+        raise typer.Exit(0)
+
+    if output is None:
+        output = Path("data/papers") / spec_dir.name
+
+    console.print(f"\n[bold]Downloading papers for:[/bold] {spec_dir}")
+    console.print(f"[bold]PMIDs found:[/bold] {len(pmids)}")
+    console.print(f"[bold]Output:[/bold] {output}\n")
+
+    results = download_papers(pmids, output, include_fulltext=not no_fulltext)
+
+    table = Table(title="Download Results")
+    table.add_column("PMID", style="cyan")
+    table.add_column("Metadata", style="green")
+    table.add_column("Full Text", style="green")
+    table.add_column("Status", style="bold")
+
+    for r in results:
+        status = "[green]OK" if r.success else f"[red]{r.error}"
+        meta = "[green]yes" if r.metadata_path else "[red]no"
+        ft = "[green]yes" if r.fulltext_path else "[dim]no"
+        table.add_row(r.pmid, meta, ft, status)
+
+    console.print(table)
+    success = sum(1 for r in results if r.success)
+    fulltext = sum(1 for r in results if r.fulltext_path)
+    console.print(f"\n[bold]{success}/{len(results)}[/bold] metadata, [bold]{fulltext}[/bold] full text\n")
+
+
+@app.command("eval")
+def eval_cmd(
+    candidate_dir: Path = typer.Argument(
+        ...,
+        help="Path to candidate (agent-produced) module spec directory.",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+    ),
+    reference_dir: Path = typer.Argument(
+        ...,
+        help="Path to reference (ground truth) module spec directory.",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+    ),
+) -> None:
+    """
+    Score a candidate module spec against a reference ground truth.
+
+    Compares variants.csv and studies.csv on multiple dimensions:
+    variant recall/precision, genotype completeness, weight accuracy,
+    weight direction, PMID recall/precision, gene accuracy.
+
+    Examples:
+
+        dna-agents eval module_output/cyp_drug_metabolism/ data/evals/cyp_panel/
+
+        dna-agents eval agent_output/ tests/fixtures/evals/cyp_panel/
+    """
+    from dna_agents.eval_scorer import score_module
+
+    console.print(f"\n[bold]Candidate:[/bold] {candidate_dir}")
+    console.print(f"[bold]Reference:[/bold] {reference_dir}\n")
+
+    result = score_module(candidate_dir, reference_dir)
+
+    table = Table(title="Evaluation Score")
+    table.add_column("Dimension", style="cyan")
+    table.add_column("Score", style="green", justify="right")
+    table.add_column("Details")
+
+    for d in result.dimensions:
+        pct = f"{d.normalized:.0%}"
+        raw = f"({d.score:.0f}/{d.max_score:.0f})"
+        detail = d.details[0] if d.details else ""
+        if len(detail) > 70:
+            detail = detail[:67] + "..."
+        table.add_row(d.name, f"{pct} {raw}", detail)
+
+    console.print(table)
+    console.print(f"\n[bold]Overall: {result.overall:.1%}[/bold]\n")
+
+
 @app.command("serve")
 def serve(
     transport: Transport = typer.Option(

@@ -18,11 +18,20 @@ uv sync
 # Run tests
 uv run pytest
 
+# Run only unit tests (no network/Ensembl)
+uv run pytest -m "not integration"
+
 # Validate a module spec
 uv run dna-agents validate /path/to/spec/
 
 # Compile a module
 uv run dna-agents compile /path/to/spec/ -o /path/to/output/
+
+# Download papers from EuropePMC for a module's studies.csv
+uv run dna-agents download-papers data/evals/cyp_panel/
+
+# Score agent output against ground truth
+uv run dna-agents eval candidate_output/ data/evals/cyp_panel/
 
 # Start MCP server (stdio)
 uv run dna-agents-mcp serve
@@ -41,6 +50,7 @@ This project uses BioContext KB for variant research. Configure in `.mcp.json`.
 - `.claude/agents/researcher.md` — genetics researcher subagent (variant analysis)
 - `.claude/agents/reviewer.md` — quality reviewer subagent (error checking)
 - `.claude/workflows/create-module.js` — multi-agent orchestration (PI + researchers + reviewer)
+- `.claude/workflows/eval-module.js` — evaluate create-module against ground truth evals
 
 ## Module creation
 

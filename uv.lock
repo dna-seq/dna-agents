@@ -271,6 +271,7 @@ version = "0.1.0"
 source = { editable = "dna-agents" }
 dependencies = [
     { name = "duckdb" },
+    { name = "httpx" },
     { name = "polars" },
     { name = "pydantic" },
     { name = "pyyaml" },
@@ -286,6 +287,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "duckdb", specifier = ">=1.5.4" },
+    { name = "httpx", specifier = ">=0.28.0" },
     { name = "polars", specifier = ">=1.42.1" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "pyyaml", specifier = ">=6.0.3" },

@@ -13,6 +13,7 @@ dependencies = [
     "duckdb>=1.5.4",
     "typer>=0.26.8",
     "rich>=15.0.0",
+    "httpx>=0.28.0",
 ]
 
 [project.scripts]
