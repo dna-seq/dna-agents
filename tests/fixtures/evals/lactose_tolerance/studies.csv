@@ -1,0 +1,9 @@
+rsid,pmid,population,p_value,conclusion,study_design
+rs4988235,11788828,Finnish,,"Original identification of the -13910 (GRCh38 forward-strand G>A) variant fully co-segregating with adult-type hypolactasia/lactase persistence in Finnish families.",family-based-association
+rs4988235,15114531,European (CEU),,"Extended haplotype homozygosity analysis found a strong signature of recent positive selection centered on the persistence allele, consistent with a historical selective advantage in dairying populations.",population-genetics
+rs4988235,12915462,In vitro (Caco-2 cells),,"Reporter-gene assay showed the persistence-associated allele significantly increases lactase (LCT) promoter/enhancer activity relative to the ancestral allele, providing mechanistic support for the association.",functional-assay
+rs4988235,19034520,Mixed (review),,"Review of the evolutionary genetics and worldwide distribution of lactase persistence variants, including rs4988235 in Europeans and additional variants identified in African populations.",review
+rs182549,11788828,Finnish,,"Characterized as part of the persistence-associated haplotype alongside the -13910 (rs4988235) variant in the original Finnish family study.",family-based-association
+rs182549,12914565,European,,"Localized the causal lactase persistence element to a 1 Mb linkage-disequilibrium block in Europeans encompassing both rs182549 and rs4988235; rs182549 tags the same persistence haplotype.",linkage-disequilibrium-mapping
+rs182549,15114531,European (CEU),,"Selection-signature analysis at the LCT locus included this linked marker within the extended haplotype under recent positive selection.",population-genetics
+rs182549,19034520,Mixed (review),,"Review discussing rs182549 as one of the markers historically used to track the European lactase persistence haplotype.",review

@@ -1,0 +1,16 @@
+schema_version: "1.0"
+
+module:
+  name: lactose_tolerance
+  title: "Lactose Tolerance & Lactase Persistence"
+  description: "MCM6/LCT lactase persistence variants affecting adult lactose digestion"
+  report_title: "Lactose Tolerance"
+  icon: leaf
+  color: "#a5673f"
+
+defaults:
+  curator: ai-module-creator
+  method: literature-review
+  priority: medium
+
+genome_build: GRCh38
