@@ -180,7 +180,7 @@ class TestEvalScorerParquet:
         if not result.success:
             pytest.skip(f"Could not download longevitymap: {result.error}")
 
-        from dna_agents.compiler import reverse_module
+        from just_dna_compiler.compiler import reverse_module
         spec_dir = tmp_path / "spec"
         reverse_module(result.parquet_dir, spec_dir, module_name="longevitymap")
 
@@ -192,7 +192,7 @@ class TestEvalScorerParquet:
     def test_score_against_hf_module(self, tmp_path):
         """Score a reversed spec against HF module directly."""
         from dna_agents.modules import download_module
-        from dna_agents.compiler import reverse_module
+        from just_dna_compiler.compiler import reverse_module
 
         result = download_module("longevitymap", tmp_path / "parquet")
         if not result.success:

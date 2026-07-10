@@ -521,19 +521,23 @@ One row per (rsid, pmid):
 
 ## Ensembl variant resolution
 
-The compiler automatically resolves missing rsid or genomic position using a
-local Ensembl DuckDB cache (GRCh38). You only need to provide **one** of rsid
-or (chrom + start + ref) per variant — the compiler fills in the other.
+The compiler resolves missing rsid or genomic position against a local Ensembl
+reference cache (GRCh38) via `just-dna-compiler` (inject-only — it never
+downloads). You only need to provide **one** of rsid or (chrom + start + ref)
+per variant — resolution fills in the other.
 
-The resolver searches for the DuckDB in this order:
+The reference is located in this order (see `just_dna_compiler.cache`):
 
 1. Explicit `--ensembl-cache` CLI flag
-2. `ENSEMBL_CACHE_DIR` environment variable
-3. Default cache at `~/.cache/just-dna-pipelines/ensembl_variations/`
-4. Auto-build from `just_dna_pipelines` if installed
+2. `JUST_DNA_ENSEMBL_CACHE` environment variable (a `.duckdb` file or a directory)
+3. `<base>/ensembl_variations/` under `JUST_DNA_PIPELINES_CACHE_DIR`, else the
+   platformdirs user cache — the same layout just-dna-lite uses
+   (`~/.cache/just-dna-pipelines/ensembl_variations/`)
 
-If no DuckDB is found and `just_dna_pipelines` is not installed, resolution is
-skipped with a warning.
+If none is present, `dna-agents compile --resolve` provisions the parquet cache
+from HuggingFace Hub (`just-dna-seq/ensembl_variations`) into
+`<base>/ensembl_variations/data/`. If the download can't run (no
+`huggingface_hub`), resolution is skipped with a warning rather than failing.
 
 ## Testing
 

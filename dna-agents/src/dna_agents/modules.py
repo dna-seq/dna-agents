@@ -138,7 +138,7 @@ def download_module(
         result.success = True
 
         if reverse:
-            from dna_agents.compiler import reverse_module
+            from just_dna_compiler.compiler import reverse_module
 
             if spec_output_dir is None:
                 spec_output_dir = Path(output_dir) / f"{name}_spec"

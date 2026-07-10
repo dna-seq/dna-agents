@@ -44,23 +44,42 @@ A module spec directory contains three files:
 2. variants.csv
    ─────────────
    Required columns: rsid OR (chrom + start), genotype, state, conclusion
-   Optional columns: ref, alts, weight, priority, gene, phenotype, category,
-                     clinvar, pathogenic, benign, curator, method
+   Optional columns: ref, alts, weight, negatives, priority, gene, phenotype,
+                     category, clinvar, pathogenic, benign, curator, method,
+                     direction, stat_significance, effect_size, effect_measure,
+                     effect_allele, flags, trait_efo_id, clin_sig
 
    - rsid: dbSNP identifier (e.g. rs1801133)
    - chrom: Chromosome without 'chr' prefix (1-22, X, Y, MT)
    - start: 0-based genomic position (GRCh38)
-   - genotype: Slash-separated sorted alleles (e.g. A/G)
+   - genotype: sorted slash-separated alleles (A/G), a single hemizygous allele
+               (A, for non-PAR X/Y or homoplasmic MT), or phased alleles (A|G)
    - state: One of: risk, protective, neutral, significant, alt, ref
-   - weight: Float score (positive=protective, negative=risk)
+            (legacy; prefer the orthogonal `direction` + `stat_significance`)
+   - weight: module-local score (positive=protective, negative=risk); NOT a
+             published effect size — use effect_size/effect_measure for that
    - conclusion: Human-readable interpretation
+   - negatives: optional adverse/antagonistic-pleiotropy counterpart to conclusion
+   - direction: protective | risk | neutral | unknown (effect direction)
+   - stat_significance: significant | suggestive | not_significant | unknown
+   - clin_sig: ClinVar/ACMG tier (VEP CLIN_SIG vocabulary, e.g. pathogenic)
+   - effect_allele / effect_size / effect_measure: which allele the effect refers
+     to and its published magnitude (measure e.g. OR, HR, beta, RR)
+   - flags: open tag list; reserved: conditional, phased, pleiotropic
+   - trait_efo_id: EFO/MONDO/OBA/HP trait ontology id(s), e.g. EFO_0001645
 
 3. studies.csv (mandatory)
    ────────────
    Required columns: rsid OR (chrom + start), pmid
-   Optional columns: population, p_value, conclusion, study_design
+   Optional columns: population, p_value, conclusion, study_design,
+                     stat_significance, effect_size, effect_measure, trait_efo_id
 
-   Every variant must have at least one study reference (PMID).
+   Every variant must have at least one study reference. pmid must contain at
+   least one PubMed ID (bare digits, or a bracketed/prefixed form like
+   "[PMID: 9545397]"); dbSNP URLs are rejected.
+
+For the authoritative, always-current field reference see the just-dna-format
+spec (just_dna_format.spec) and the module AGENTS.md.
 """
 
 # ── Valid icons and colors ────────────────────────────────────────────────────
@@ -134,7 +153,7 @@ def create_server(settings: Settings | None = None) -> FastMCP:
             -> {"valid": true, "errors": [], "warnings": [],
                 "stats": {"variant_rows": 42, "unique_rsids": 15, ...}}
         """
-        from dna_agents.compiler import validate_spec as _validate_spec
+        from just_dna_compiler.compiler import validate_spec as _validate_spec
 
         result = _validate_spec(Path(spec_dir))
         return result.model_dump(mode="json")
@@ -166,7 +185,7 @@ def create_server(settings: Settings | None = None) -> FastMCP:
                 "errors": [], "warnings": [],
                 "stats": {"weights_rows": 42, "annotations_rows": 15, ...}}
         """
-        from dna_agents.compiler import compile_module as _compile_module
+        from just_dna_compiler.compiler import compile_module as _compile_module
 
         out = Path(output_dir) if output_dir else Path(settings.output_dir)
         result = _compile_module(

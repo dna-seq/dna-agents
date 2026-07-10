@@ -60,7 +60,7 @@ def validate(
     Checks YAML structure, CSV row validity, cross-row consistency,
     and weight/state directionality.
     """
-    from dna_agents.compiler import validate_spec
+    from just_dna_compiler.compiler import validate_spec
 
     console.print(f"\n[bold]Validating:[/bold] {spec_dir}\n")
     result = validate_spec(spec_dir)
@@ -131,7 +131,7 @@ def compile_cmd(
     Produces weights.parquet, annotations.parquet, and studies.parquet
     in the output directory.
     """
-    from dna_agents.compiler import compile_module
+    from just_dna_compiler.compiler import compile_module
 
     from dna_agents_mcp.config import get_settings
 
@@ -152,12 +152,18 @@ def compile_cmd(
     console.print(f"[bold]Output:   [/bold] {output}")
     console.print(f"[bold]Resolve:  [/bold] {'yes' if resolve else 'no'}\n")
 
+    reference = ensembl_cache
+    if resolve:
+        from dna_agents.resolver import ensure_resolver_reference
+
+        reference = ensure_resolver_reference(ensembl_cache)
+
     result = compile_module(
         spec_dir,
         output,
         compression=compression,
         resolve_with_ensembl=resolve,
-        ensembl_cache=ensembl_cache,
+        ensembl_cache=reference,
     )
 
     if result.errors:

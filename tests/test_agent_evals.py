@@ -171,7 +171,7 @@ class TestAgentEvalSmoke:
 
         _assert_output_files(output_dir)
 
-        from dna_agents.compiler import validate_spec
+        from just_dna_compiler.compiler import validate_spec
         validation = validate_spec(output_dir)
         assert validation.valid, (
             f"Agent output failed validation:\n"

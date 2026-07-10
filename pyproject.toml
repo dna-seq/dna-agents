@@ -1,8 +1,11 @@
 [project]
 name = "dna-agents-workspace"
-version = "0.1.0"
+version = "0.3.0"
 description = "DNA annotation agents workspace"
 requires-python = ">=3.14"
+dependencies = [
+    "just-dna-registry>=0.9.1",
+]
 
 [tool.uv.workspace]
 members = ["dna-agents", "dna-agents-mcp"]

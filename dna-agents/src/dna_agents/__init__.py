@@ -1,21 +1,12 @@
 """
-dna-agents: Module compiler and agent definitions for DNA annotation.
+dna-agents: agent definitions and tooling for DNA annotation module creation.
 
-Public API:
-    CompilationResult   — result of spec compilation
-    ValidationResult    — result of spec validation
-    ModuleSpecConfig    — top-level model for module_spec.yaml
-    validate_spec       — validate a module spec directory
-    compile_module      — compile a spec to parquet
+The module spec schema and compiler now live in the shared libraries — import them directly:
+
+    from just_dna_format.spec import ModuleSpecConfig, VariantRow, StudyRow
+    from just_dna_compiler.compiler import validate_spec, compile_module, reverse_module
+    from just_dna_compiler.models import ValidationResult, CompilationResult
+
+This package provides the agents-specific layer: paper downloading (`papers`), HF module
+downloading (`modules`), eval scoring (`eval_scorer`), and Ensembl cache provisioning (`resolver`).
 """
-
-from dna_agents.compiler import compile_module, validate_spec
-from dna_agents.models import CompilationResult, ModuleSpecConfig, ValidationResult
-
-__all__ = [
-    "CompilationResult",
-    "ValidationResult",
-    "ModuleSpecConfig",
-    "validate_spec",
-    "compile_module",
-]
