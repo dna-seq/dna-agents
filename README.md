@@ -439,7 +439,14 @@ dna-agents/
 
 ## Module spec format
 
-A module spec directory contains three files:
+A module **composes** from optional table kinds (just-dna-format 0.4). The common
+case is the SNP core below (`module_spec.yaml` + `variants.csv` + `studies.csv`);
+a module may also/instead carry PGS (`pgs.csv`), PGx star-allele
+(`haplotypes.csv`, `allele_function.csv`, `diplotypes.csv`, `activity_phenotype.csv`,
+`pharm_variants.csv`), or binning (`copynumbers.csv`, `repeat_alleles.csv`,
+`heteroplasmy.csv`) tables. The authoritative, always-current field reference is
+served live by the MCP `get_spec_format` / `get_spec_schemas` tools — the tables
+below are a quick reference for the SNP core.
 
 ### module_spec.yaml
 
@@ -447,7 +454,6 @@ A module spec directory contains three files:
 schema_version: "1.0"
 module:
   name: my_module           # lowercase, underscores only
-  version: 1
   title: "My Module"
   description: "One-line description"
   report_title: "Report Title"
@@ -468,7 +474,7 @@ One row per (rsid, genotype) combination:
 |--------|----------|-------------|
 | rsid | yes* | dbSNP ID (rs...). Blank if chrom/start/ref/alts present |
 | chrom | no | Chromosome without "chr" prefix |
-| start | no | 1-based position (GRCh38) |
+| start | no | 0-based position (GRCh38) |
 | ref | no | Reference allele |
 | alts | no | Alt allele(s) |
 | genotype | yes | Slash-separated sorted alleles (A/G not G/A) |

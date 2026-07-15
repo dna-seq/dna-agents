@@ -19,9 +19,23 @@ these tools are available:
 
 - **validate_spec** — validate a module spec directory
 - **compile_module** — compile a spec to parquet files
-- **get_spec_format** — get the full module spec format reference
-- **list_icons** — valid icon names and semantic uses
-- **list_colors** — valid hex colors and semantic uses
+- **get_spec_format** — the full spec format reference, generated **live** from
+  just-dna-format (models, fields, vocabularies, reserved names, palette). This
+  is the authoritative, always-current field list — it cannot drift from what the
+  compiler enforces, so prefer it over the static tables below.
+- **get_spec_schemas** — full JSON Schema per authored model (machine-validatable)
+- **list_icons** — recommended icons, keyed by semantic use
+- **list_colors** — recommended hex colors, keyed by semantic use
+
+> **just-dna-format 0.4:** a module now *composes* from optional table kinds — the
+> SNP core (`variants.csv` + `studies.csv`) and/or 0.4 tables (`pgs.csv`,
+> `diplotypes.csv`, `pharm_variants.csv`, `haplotypes.csv`, `allele_function.csv`,
+> and the binning kinds: `copynumbers.csv`, `repeat_alleles.csv`,
+> `heteroplasmy.csv`, `activity_phenotype.csv`). VariantRow gains
+> `requires_callable` / `acmg_sf` / `actionability`; StudyRow gains `doi` /
+> `provenance_quote` / `provenance_regex`; module metadata gains structured
+> `authorship`. Unknown/misspelled columns are now a hard error (`extra="forbid"`).
+> Call `get_spec_format` / `get_spec_schemas` for the exact current fields.
 
 Additionally, BioContext KB (`https://biocontext-kb.fastmcp.app/mcp`) provides
 Ensembl, EuropePMC, UniProt, Open Targets, Reactome, KEGG, ClinicalTrials,
@@ -35,7 +49,6 @@ AlphaFold, InterPro, OLS, and STRINGDb tools for variant research.
 schema_version: "1.0"
 module:
   name: my_module           # lowercase, underscores only
-  version: 1
   title: "My Module"
   description: "..."
   report_title: "..."
@@ -83,7 +96,7 @@ One row per (rsid, genotype) combination:
 |------------|----------|-------------|
 | rsid       | yes*     | dbSNP ID (rs...). Blank OK if chrom/start/ref/alts present |
 | chrom      | no       | Chromosome without "chr" prefix |
-| start      | no       | 1-based position (GRCh38) |
+| start      | no       | **0-based** position (GRCh38) |
 | ref        | no       | Reference allele |
 | alts       | no       | Alt allele(s) |
 | genotype   | yes      | Slash-separated SORTED alleles (A/G not G/A) |
@@ -94,6 +107,12 @@ One row per (rsid, genotype) combination:
 | phenotype  | yes      | Associated trait |
 | category   | yes      | Grouping category |
 
+Optional 0.4 columns (blank when unstated): `actionability`, `acmg_sf`,
+`requires_callable`, `clin_sig`, plus `direction` / `stat_significance` /
+`effect_size` / `effect_measure` / `effect_allele` / `flags` / `trait_efo_id`.
+`clinvar` / `pathogenic` / `benign` are tri-state (true/false/blank) — leave blank
+when you have no assertion. Call `get_spec_format` for the authoritative list.
+
 ### studies.csv (mandatory)
 
 One row per (rsid, pmid):
@@ -101,6 +120,10 @@ One row per (rsid, pmid):
 ```
 rsid,pmid,population,p_value,conclusion,study_design
 ```
+
+Optional 0.4 provenance columns: `doi`, `provenance_quote` (a literal grounding
+passage from the cited fulltext), `provenance_regex`. Populate them when the source
+is in hand.
 
 ## Critical Rules
 

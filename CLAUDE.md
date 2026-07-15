@@ -81,11 +81,15 @@ This project uses BioContext KB for variant research. Configure in `.mcp.json`.
 
 ## Agent definitions
 
-- `.claude/agents/paper-scout.md` — deep-research agent: finds and triages papers suitable for module creation
-- `.claude/agents/module-creator.md` — solo module creator (single agent, full workflow)
+- `.claude/agents/paper-scout.md` — deep-research agent: finds and triages papers, routing each to a module kind (SNP / PGS / PGx)
+- `.claude/agents/module-creator.md` — solo SNP module creator (single agent, full workflow)
+- `.claude/agents/pgs-module-creator.md` — polygenic-score module creator (curates PGS Catalog ids into pgs.csv)
+- `.claude/agents/pgx-module-creator.md` — star-allele PGx module creator (haplotypes/allele_function/diplotypes/activity_phenotype/pharm_variants)
 - `.claude/agents/researcher.md` — genetics researcher subagent (variant analysis)
 - `.claude/agents/reviewer.md` — quality reviewer subagent (error checking)
-- `.claude/workflows/create-module.js` — multi-agent orchestration (PI + researchers + reviewer)
+- `.claude/workflows/create-module.js` — multi-agent SNP orchestration (PI + researchers + reviewer)
+- `.claude/workflows/create-pgs-module.js` — single-agent PGS module orchestration
+- `.claude/workflows/create-pgx-module.js` — single-agent PGx module orchestration
 - `.claude/workflows/eval-module.js` — evaluate create-module against ground truth evals
 
 ## Ground truth & evals
@@ -98,11 +102,20 @@ This project uses BioContext KB for variant research. Configure in `.mcp.json`.
 
 ## Module creation
 
-Use `@paper-scout` first to find suitable papers (especially useful for non-biologists
-who may not know which paper types contain extractable SNP data vs. reviews or PRS studies).
+Use `@paper-scout` first to find suitable papers and route each to a module **kind**
+(especially useful for non-biologists who may not know which paper types contain
+extractable data). A module composes from optional table kinds (just-dna-format 0.4):
 
-Then use `@module-creator` for single-agent module creation, or run the
-`create-module` workflow for the full PI + researcher team setup.
+- **SNP** — `@module-creator`, or the `create-module` workflow for the full PI +
+  researcher + reviewer team.
+- **PGS** (polygenic-score manifest) — `@pgs-module-creator`, or `create-pgs-module`.
+- **PGx** (star-allele pharmacogenomics) — `@pgx-module-creator`, or `create-pgx-module`.
+- **Binning** (copy number / repeat expansion / mtDNA heteroplasmy) — not yet supported.
+
+The authoritative field reference for any kind is the MCP `get_spec_format` /
+`get_spec_schemas` tool (drift-proof, generated from the just-dna-format models).
 
 See `AGENTS.md` for the complete module spec format reference.
 See `docs/module-creation-guide.md` for a human-facing guide on paper selection.
+See `docs/BACKLOG.md` for just-dna-format features not yet adopted (binning kind,
+per-kind evals, gene panels, resolver-behavior awareness, ...).

@@ -82,6 +82,8 @@ const FINDINGS_SCHEMA = {
               properties: {
                 pmid: { type: 'string' },
                 summary: { type: 'string' },
+                doi: { type: 'string' },
+                quote: { type: 'string', description: 'verbatim grounding sentence from the paper, if available' },
               },
               required: ['pmid', 'summary'],
             },
@@ -159,9 +161,11 @@ const draftSummary = consensusVariants.map(v => {
   const genotypes = (v.genotypes || []).map(g =>
     `  ${g.genotype}: ${g.state}, weight ${g.weight} — ${g.conclusion}`
   ).join('\n')
-  const evidence = (v.evidence || []).map(e =>
-    `  PMID:${e.pmid} — ${e.summary}`
-  ).join('\n')
+  const evidence = (v.evidence || []).map(e => {
+    const doi = e.doi ? ` (doi:${e.doi})` : ''
+    const quote = e.quote ? `\n    quote: "${e.quote}"` : ''
+    return `  PMID:${e.pmid}${doi} — ${e.summary}${quote}`
+  }).join('\n')
   return `rsid: ${v.rsid || 'unknown'}\ngene: ${v.gene}\nconfidence: ${v.confidence} (${v.researcher_count} researchers)\ngenotypes:\n${genotypes}\nevidence:\n${evidence}`
 }).join('\n\n')
 
@@ -198,10 +202,28 @@ ${review ? `ERRORS: ${JSON.stringify(review.errors)}\nWARNINGS: ${JSON.stringify
    low-confidence ones have strong PMID support
 4. Write the final module spec files to: ${outputDir}/
 
-Write three files:
-- module_spec.yaml (with proper icon, color, genome_build: GRCh38)
+Write the spec files:
+- module_spec.yaml (proper icon, color, genome_build: GRCh38, and the authorship
+  block below)
 - variants.csv (all genotypes, sorted alleles, proper quoting)
-- studies.csv (all PMIDs from researcher evidence)
+- studies.csv (all PMIDs from researcher evidence; add doi / provenance_quote when
+  a researcher supplied a grounding quote)
+
+Record structured authorship in module_spec.yaml reflecting this team run — the PI
+plus ${validResults.length} researchers created it (a team), and a reviewer audited it.
+Add \`authorship\` as a TOP-LEVEL key (sibling of module / defaults / genome_build,
+NOT nested under module:):
+
+    genome_build: GRCh38
+    authorship:
+      - who: pi-synthesizer
+        role: created
+        kind: [ai, team]
+      - who: reviewer
+        role: reviewed
+        kind: [ai, agent]
+
+(Call the MCP get_spec_format tool if unsure of any column or the authorship shape.)
 
 Then validate the module with: uv run dna-agents validate ${outputDir}/<module_name>/
 

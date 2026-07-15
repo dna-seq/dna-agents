@@ -53,8 +53,11 @@ IMPORTANT:
 - Write proper CSV files with headers matching the spec format
 - Validate the output with: uv run dna-agents validate ${outputDir}/
 
-The variants.csv must have columns: rsid,genotype,weight,state,conclusion,priority,gene,phenotype,category
-The studies.csv must have columns: rsid,pmid,population,p_value,conclusion,study_design`,
+The variants.csv core columns: rsid,genotype,weight,state,conclusion,gene,phenotype,category
+The studies.csv core columns: rsid,pmid,population,p_value,conclusion,study_design
+Optional columns (e.g. chrom/start/ref/alts, priority, clin_sig, actionability) may be
+added — call the MCP get_spec_format tool for the authoritative column set. Unknown or
+misspelled columns are a hard compile error, so match names exactly.`,
   {
     label: `create-${evalName}`,
     phase: 'Create',

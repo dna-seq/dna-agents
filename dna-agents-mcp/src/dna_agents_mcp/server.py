@@ -3,6 +3,12 @@ FastMCP server wrapping the dna_agents module compiler tools.
 
 Exposes validation, compilation, spec format reference, and
 icon/color listing as MCP tools.
+
+The spec-format reference and the recommended icon/colour palettes are NOT hand-maintained here.
+They are read live from ``just_dna_format`` — ``reference.authoring_reference()`` and
+``manifest.RECOMMENDED_ICONS`` / ``RECOMMENDED_COLORS`` — so they cannot drift from the schema the
+compiler actually enforces (the exact failure mode ``just_dna_format.reference`` was written to kill:
+its docstring names this server's old ``get_spec_format`` as the drift it replaces).
 """
 
 from pathlib import Path
@@ -17,110 +23,6 @@ from dna_agents_mcp.config import Settings, get_settings
 # by the client (the MCP background-task protocol).
 TASK = TaskConfig(mode="optional")
 
-# ── Spec format reference (hardcoded summary) ────────────────────────────────
-
-SPEC_FORMAT_REFERENCE = """\
-Module Spec Directory Format
-=============================
-
-A module spec directory contains three files:
-
-1. module_spec.yaml
-   ─────────────────
-   schema_version: "1.0"
-   module:
-     name: <lowercase_underscored>     # Machine name
-     title: <string>                    # Human-readable title
-     description: <string>             # One-liner
-     report_title: <string>            # Title for reports
-     icon: <fomantic_ui_icon>          # e.g. "dna", "heartbeat", "pills"
-     color: <hex_color>                # e.g. "#21ba45"
-   defaults:
-     curator: <string>                 # Default curator identifier
-     method: <string>                  # Default annotation method
-     priority: <low|medium|high>       # Optional default priority
-   genome_build: "GRCh38"
-
-2. variants.csv
-   ─────────────
-   Required columns: rsid OR (chrom + start), genotype, state, conclusion
-   Optional columns: ref, alts, weight, negatives, priority, gene, phenotype,
-                     category, clinvar, pathogenic, benign, curator, method,
-                     direction, stat_significance, effect_size, effect_measure,
-                     effect_allele, flags, trait_efo_id, clin_sig
-
-   - rsid: dbSNP identifier (e.g. rs1801133)
-   - chrom: Chromosome without 'chr' prefix (1-22, X, Y, MT)
-   - start: 0-based genomic position (GRCh38)
-   - genotype: sorted slash-separated alleles (A/G), a single hemizygous allele
-               (A, for non-PAR X/Y or homoplasmic MT), or phased alleles (A|G)
-   - state: One of: risk, protective, neutral, significant, alt, ref
-            (legacy; prefer the orthogonal `direction` + `stat_significance`)
-   - weight: module-local score (positive=protective, negative=risk); NOT a
-             published effect size — use effect_size/effect_measure for that
-   - conclusion: Human-readable interpretation
-   - negatives: optional adverse/antagonistic-pleiotropy counterpart to conclusion
-   - direction: protective | risk | neutral | unknown (effect direction)
-   - stat_significance: significant | suggestive | not_significant | unknown
-   - clin_sig: ClinVar/ACMG tier (VEP CLIN_SIG vocabulary, e.g. pathogenic)
-   - effect_allele / effect_size / effect_measure: which allele the effect refers
-     to and its published magnitude (measure e.g. OR, HR, beta, RR)
-   - flags: open tag list; reserved: conditional, phased, pleiotropic
-   - trait_efo_id: EFO/MONDO/OBA/HP trait ontology id(s), e.g. EFO_0001645
-
-3. studies.csv (mandatory)
-   ────────────
-   Required columns: rsid OR (chrom + start), pmid
-   Optional columns: population, p_value, conclusion, study_design,
-                     stat_significance, effect_size, effect_measure, trait_efo_id
-
-   Every variant must have at least one study reference. pmid must contain at
-   least one PubMed ID (bare digits, or a bracketed/prefixed form like
-   "[PMID: 9545397]"); dbSNP URLs are rejected.
-
-For the authoritative, always-current field reference see the just-dna-format
-spec (just_dna_format.spec) and the module AGENTS.md.
-"""
-
-# ── Valid icons and colors ────────────────────────────────────────────────────
-
-VALID_ICONS = {
-    "dna": "Genetic/DNA-related modules",
-    "heartbeat": "Cardiovascular health",
-    "pills": "Pharmacogenomics / drug metabolism",
-    "brain": "Neurological / cognitive traits",
-    "shield": "Immune system / defense",
-    "eye": "Vision / ophthalmology",
-    "bone": "Skeletal / bone health",
-    "leaf": "Nutrition / metabolism",
-    "running": "Athletic / fitness traits",
-    "tint": "Blood / hematology",
-    "sun": "Dermatology / skin traits",
-    "database": "General / uncategorized (default)",
-    "flask": "Biochemistry / lab markers",
-    "user md": "Clinical / medical genetics",
-    "chart line": "Quantitative traits / biomarkers",
-    "weight": "Body composition / anthropometrics",
-    "clock": "Circadian / chronobiology",
-    "fire": "Inflammation / autoimmune",
-    "puzzle piece": "Complex / multi-gene traits",
-    "star": "Notable / highlighted modules",
-}
-
-VALID_COLORS = {
-    "#db2828": "Red - high risk / critical findings",
-    "#f2711c": "Orange - moderate risk / caution",
-    "#fbbd08": "Yellow - low risk / attention",
-    "#21ba45": "Green - protective / positive",
-    "#2185d0": "Blue - informational / neutral",
-    "#6435c9": "Violet - default / general (default)",
-    "#a5673f": "Brown - metabolic / nutrition",
-    "#e03997": "Pink - hormonal / reproductive",
-    "#00b5ad": "Teal - immune / defense",
-    "#767676": "Grey - uncertain / VUS",
-    "#1b1c1d": "Black - strong evidence / confirmed",
-}
-
 
 def create_server(settings: Settings | None = None) -> FastMCP:
     """Build and configure the DNA Agents MCP server."""
@@ -129,10 +31,12 @@ def create_server(settings: Settings | None = None) -> FastMCP:
         "dna-agents-mcp",
         instructions=(
             "DNA annotation module compiler tools. Validate and compile module "
-            "spec directories (module_spec.yaml + variants.csv + studies.csv) "
-            "into deployable parquet files. Use get_spec_format to learn the "
-            "spec directory structure, list_icons / list_colors for valid UI "
-            "metadata values."
+            "spec directories into deployable parquet files. As of just-dna-format "
+            "0.4 a module composes from optional table kinds: the SNP core "
+            "(variants.csv + studies.csv) and/or 0.4 tables (pgs.csv, diplotypes.csv, "
+            "pharm_variants.csv, the binning kinds, ...). Use get_spec_format for the "
+            "live, drift-proof field/vocabulary reference (get_spec_schemas for full "
+            "JSON Schema), and list_icons / list_colors for the recommended UI palette."
         ),
     )
 
@@ -167,8 +71,10 @@ def create_server(settings: Settings | None = None) -> FastMCP:
         """Compile a module spec directory into deployable parquet files.
 
         Validates the spec, optionally resolves missing rsid/position via
-        Ensembl DuckDB, and produces weights.parquet, annotations.parquet,
-        and studies.parquet in the output directory.
+        Ensembl DuckDB, and produces the composed parquet artifact in the
+        output directory: the SNP core (weights/annotations/studies) when the
+        module carries variants, plus one parquet per 0.4 table kind present
+        (pgs, diplotypes, pharm_variants, the binning kinds, ...).
 
         Args:
             spec_dir: Path to the module spec directory.
@@ -197,44 +103,75 @@ def create_server(settings: Settings | None = None) -> FastMCP:
         return result.model_dump(mode="json")
 
     @mcp.tool()
-    async def get_spec_format() -> str:
-        """Return the module spec format reference.
+    async def get_spec_format() -> dict[str, Any]:
+        """Return the module spec format reference, generated live from just-dna-format.
 
-        Describes the expected directory structure, file formats, and
-        field definitions for module spec directories.
+        Introspects the current Pydantic models and vocabularies (via
+        ``just_dna_format.reference.authoring_reference``) so the field set,
+        vocabularies, reserved names, and recommended display palette can never
+        drift from what the compiler enforces. Covers the SNP core (VariantRow /
+        StudyRow) and every 0.4 table kind (binning / PGx / PGS).
+
+        Returns a dict with keys: schema_version, genome_build_default, models
+        (per-model field lists: name/type/required/description), vocabularies,
+        open_recommended, reserved_names, recommended_palette.
 
         Example:
             get_spec_format()
-            -> "Module Spec Directory Format\\n===...\\n"
+            -> {"schema_version": "1.0", "models": {"VariantRow": [...], ...}, ...}
         """
-        return SPEC_FORMAT_REFERENCE
+        from just_dna_format.reference import authoring_reference
+
+        return authoring_reference()
+
+    @mcp.tool()
+    async def get_spec_schemas() -> dict[str, Any]:
+        """Return the full JSON Schema for every authored model.
+
+        The machine-validatable form of the spec (Pydantic ``model_json_schema``
+        per model), for consumers that want to validate authored rows directly
+        rather than read the compact ``get_spec_format`` summary.
+
+        Example:
+            get_spec_schemas()
+            -> {"VariantRow": {"$defs": {...}, "properties": {...}, ...}, ...}
+        """
+        from just_dna_format.reference import json_schemas
+
+        return json_schemas()
 
     @mcp.tool()
     async def list_icons() -> dict[str, str]:
-        """Return valid Fomantic UI icon names and their semantic uses.
+        """Return the recommended Fomantic UI icons, keyed by semantic use.
 
-        Use these when creating module_spec.yaml to pick an appropriate
-        icon for the module's subject area.
+        The curated authoring palette from just-dna-format
+        (``manifest.RECOMMENDED_ICONS``) — pick the icon for the module's subject
+        area when authoring module_spec.yaml. Recommendation only: ``icon`` is
+        free-form within its ``icon_set``, so any Fomantic glyph is accepted.
 
         Example:
             list_icons()
-            -> {"dna": "Genetic/DNA-related modules",
-                "heartbeat": "Cardiovascular health", ...}
+            -> {"cardiometabolic": "heartbeat", "pharmacogenomic": "pills", ...}
         """
-        return VALID_ICONS
+        from just_dna_format.manifest import RECOMMENDED_ICONS
+
+        return dict(RECOMMENDED_ICONS)
 
     @mcp.tool()
     async def list_colors() -> dict[str, str]:
-        """Return valid hex colors and their semantic uses.
+        """Return the recommended hex colours, keyed by semantic use.
 
-        Use these when creating module_spec.yaml to pick an appropriate
-        color for the module's risk level or category.
+        The curated authoring palette from just-dna-format
+        (``manifest.RECOMMENDED_COLORS``) — pick the colour for the module's
+        risk level or category when authoring module_spec.yaml. Recommendation
+        only: ``color`` is validated by pattern, so any valid hex is accepted.
 
         Example:
             list_colors()
-            -> {"#db2828": "Red - high risk / critical findings",
-                "#21ba45": "Green - protective / positive", ...}
+            -> {"risk": "#db2828", "protective": "#21ba45", ...}
         """
-        return VALID_COLORS
+        from just_dna_format.manifest import RECOMMENDED_COLORS
+
+        return dict(RECOMMENDED_COLORS)
 
     return mcp

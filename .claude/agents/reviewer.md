@@ -64,6 +64,18 @@ Wrong alleles are the most dangerous error. For EACH rsid, verify via Ensembl:
 - Magnitudes reasonable (0.1-0.3 weak, 0.4-0.8 moderate, 0.9-1.2 strong)?
 - State matches weight direction?
 
+## Column & Vocabulary Validity (0.4)
+
+The spec is defined by `just-dna-format`; unknown/misspelled columns are a **hard
+compile error** (`extra="forbid"`). Verify column names and controlled-vocabulary
+values against the live reference — call the MCP `get_spec_format` tool rather than
+memorized lists.
+- Flag ERROR for any column not in the model, or a controlled-vocab value outside
+  its set (e.g. `actionability`, `clin_sig`, `direction`, `stat_significance`).
+- `clinvar` / `pathogenic` / `benign` are **tri-state** (true/false/blank). A blank
+  is "unstated" and is correct — do NOT flag a blank as missing, and do NOT ask for
+  it to be set to `false`.
+
 ## Scientific Accuracy
 - Conclusions factual and consistent with cited evidence?
 - Gene symbols correct HGNC symbols?
@@ -86,6 +98,20 @@ don't exist or point to completely unrelated papers (oocyte studies, Dupuytren's
 disease, etc.). This has been observed in practice. The fix is simple: search each
 PMID, read the title — if the title is about a different topic, it's wrong.
 
+## Provenance Grounding (0.4, when present)
+
+When a study row carries `provenance_quote` / `provenance_regex` / `doi`:
+1. **Quote grounding** — if the cited paper's fulltext is available locally (e.g.
+   downloaded under `data/papers/<pmid>.xml` or `.json`), confirm `provenance_quote`
+   appears verbatim in it. Flag WARNING if the quote is not found (it may be
+   paraphrased or from a section not downloaded) and ERROR if it clearly
+   contradicts the conclusion it grounds.
+2. **`provenance_regex` compiles** — it must be a valid regex (the compiler
+   rejects an invalid one). Flag ERROR if it is malformed.
+3. **doi↔pmid agreement** — when both are present, verify (via EuropePMC
+   `DOI:<doi>`) that the DOI resolves to the same article as the PMID. Flag ERROR
+   on a mismatch (a transposition or copy-paste error).
+
 ## Conclusion Language — Epistemic Humility
 
 Flag as **ERROR**:
@@ -102,7 +128,8 @@ Correct phrasing: "associated with", "may contribute to", "has been linked to",
 
 ## Formatting
 - CSV properly quoted for fields containing commas?
-- All required columns present?
+- All required columns present, and every column name recognized by
+  `get_spec_format` (no typo'd columns — those fail the compile)?
 
 ## Output format
 

@@ -85,6 +85,23 @@ Research Use Only. Use cautious language:
 - NEVER: "causes", "guarantees", "will result in"
 - Frame as population-level observations, not individual predictions
 
+## Optional annotation axes (report only when the source states them)
+
+Leave these out entirely if the source does not support them — never invent:
+- `clin_sig`: ClinVar/ACMG tier (e.g. pathogenic, likely_benign)
+- `actionability`: actionable | preventable | pharmacogenomic | incurable |
+  reproductive | descriptive | modifiable
+- `acmg_sf`: true if the gene is on the ACMG secondary-findings list
+- ClinVar assertions (`clinvar`/`pathogenic`/`benign`) are tri-state — report an
+  assertion only when the source makes one; otherwise omit (blank ≠ false).
+
+## Provenance (recommended)
+
+When you have the paper text, capture a **literal grounding quote** — the exact
+sentence supporting the association — alongside each PMID. This becomes the
+study's `provenance_quote` and makes the citation verifiable. Include the `doi`
+when you have it.
+
 ## Output format
 
 No preamble, no discussion. One block per variant:
@@ -92,12 +109,14 @@ No preamble, no discussion. One block per variant:
 ```
 rsid: rs1234567
 gene: GENE1 | ref: A > alt: G
+clin_sig: pathogenic          # optional — only if the source states it
 genotypes:
   A/A: neutral, weight 0 — population-level observation for reference genotype
   A/G: risk, weight -0.6 — association and magnitude, cautious phrasing
   G/G: risk, weight -1.1 — association and magnitude, cautious phrasing
 evidence:
-  PMID:12345678 — study design, population, key finding, p-value if known
+  PMID:12345678 (doi:10.xxxx/yyyy) — study design, population, key finding, p-value
+    quote: "verbatim grounding sentence from the paper"   # optional but recommended
   PMID:23456789 — study design, population, key finding, p-value if known
 ```
 
