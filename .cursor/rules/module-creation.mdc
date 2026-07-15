@@ -1,0 +1,30 @@
+---
+description: How to create genetics annotation modules in Cursor (paper-scout, module-creator, multi-agent team)
+alwaysApply: true
+---
+
+# Module creation in Cursor
+
+Shared agent prompts live in `.claude/agents/` (single source of truth — do not fork).
+
+## When the user wants a module
+
+1. **Unclear paper / kind** → Task `paper-scout` (read `.claude/agents/paper-scout.md`); route SNP / PGS / PGx.
+2. **SNP solo** → Task `module-creator` (`.claude/agents/module-creator.md`).
+3. **PGS** → Task `pgs-module-creator` (`.claude/agents/pgs-module-creator.md`).
+4. **PGx** → Task `pgx-module-creator` (`.claude/agents/pgx-module-creator.md`).
+5. **SNP high-stakes / full team** → parallel Task `researcher` (×2–3), then Task `reviewer`, then synthesize as PI.
+6. Or slash **create-module** (SNP team flow).
+
+## After writing specs
+
+```bash
+uv run dna-agents validate <spec_dir>/
+uv run dna-agents compile <spec_dir>/ -o <output_dir>/
+```
+
+Use MCP `validate_spec` / `compile_module` / `get_spec_format` when connected. BioContext KB for Ensembl + EuropePMC.
+
+## Portable paths only
+
+Use repo-relative `uv run …`. Never hardcode machine-absolute paths or personal API keys in committed files.

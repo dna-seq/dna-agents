@@ -81,6 +81,8 @@ This project uses BioContext KB for variant research. Configure in `.mcp.json`.
 
 ## Agent definitions
 
+Shared prompts (Claude Code + Cursor — do not fork under `.cursor/`):
+
 - `.claude/agents/paper-scout.md` — deep-research agent: finds and triages papers, routing each to a module kind (SNP / PGS / PGx)
 - `.claude/agents/module-creator.md` — solo SNP module creator (single agent, full workflow)
 - `.claude/agents/pgs-module-creator.md` — polygenic-score module creator (curates PGS Catalog ids into pgs.csv)
@@ -91,6 +93,12 @@ This project uses BioContext KB for variant research. Configure in `.mcp.json`.
 - `.claude/workflows/create-pgs-module.js` — single-agent PGS module orchestration
 - `.claude/workflows/create-pgx-module.js` — single-agent PGx module orchestration
 - `.claude/workflows/eval-module.js` — evaluate create-module against ground truth evals
+
+Cursor-only portable wrappers (rules + slash commands; machine state gitignored):
+
+- `.cursor/rules/` — always-on critical rules + module-creation workflow
+- `.cursor/commands/create-module.md` — Cursor equivalent of `/workflow create-module`
+- `.cursor/commands/paper-scout.md` — paper triage slash command
 
 ## Ground truth & evals
 

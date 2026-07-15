@@ -1,0 +1,22 @@
+---
+description: Critical genetics annotation rules for dna-agents modules (GRCh38, alleles, PMIDs, humility)
+alwaysApply: true
+---
+
+# dna-agents — critical rules
+
+Research Use Only. Modules are for just-dna-lite annotation, not clinical advice.
+
+1. **GRCh38 ONLY** — never GRCh37/hg19 coordinates.
+2. **Forward-strand alleles ONLY** — ref/alt must match Ensembl plus strand. Never reverse-strand complements from papers.
+3. **Verify ref/alt via Ensembl** — genotype alleles ⊆ {ref, alt}.
+4. **Compiler auto-resolves** — provide rsid OR coordinates, not both lookups.
+5. **Epistemic humility** — "associated with" / "may contribute to". NEVER "causes" / "guarantees".
+6. **Alleles sorted alphabetically** — A/G not G/A.
+7. **Include wild-type** — ref/ref with weight 0, state `neutral`.
+8. **Weight range** — -1.5 to +1.5.
+9. **Verify every PMID** via EuropePMC (title/topic match). Never invent PMIDs.
+10. **studies.csv is mandatory** for SNP modules.
+
+Authoritative format: `AGENTS.md` and MCP `get_spec_format`. Prefer MCP when available.
+Validate with: `uv run dna-agents validate <spec_dir>/`

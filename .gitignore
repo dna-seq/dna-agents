@@ -228,3 +228,10 @@ data/modules/
 .claude/settings.local.json
 !.claude/agents/
 !.claude/workflows/
+
+# Cursor — ignore machine-local state; commit only portable project config
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
+!.cursor/commands/
+!.cursor/commands/**

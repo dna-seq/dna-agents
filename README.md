@@ -33,7 +33,7 @@ You can use it three ways:
 
 - [Creating modules (guide for non-biologists)](#creating-modules-guide-for-non-biologists)
 - [Use with Claude, Cursor, Codex, Antigravity, or other agents](#use-with-claude-cursor-codex-antigravity-or-other-agents)
-- [Claude Code agents and workflows](#claude-code-agents-and-workflows)
+- [Agents and workflows (Claude Code + Cursor)](#agents-and-workflows-claude-code--cursor)
 - [Evals (Quick Play)](#evals-quick-play)
 - [Test genomes](#test-genomes)
 - [CLI and Python](#cli-and-python)
@@ -119,8 +119,29 @@ Restart Claude Desktop. The module compiler tools will appear in the tools menu
 
 ### Cursor
 
-Add to `.cursor/mcp.json` in your project, or to your global Cursor MCP
-configuration:
+This repo already ships a portable root [`.mcp.json`](.mcp.json) (`uv run`
+dna-agents-mcp + BioContext KB). Open the project in Cursor and the MCP servers
+should load — no machine-specific `.cursor/mcp.json` required.
+
+Shared Cursor config (committed; safe for every clone):
+
+| Path | Purpose |
+|------|---------|
+| `.cursor/rules/` | Always-on genetics rules + module-creation workflow |
+| `.cursor/commands/` | Slash commands: `create-module`, `paper-scout` |
+
+Machine-local Cursor state is gitignored (see `.gitignore`). Agent prompts stay
+in `.claude/agents/` so Claude Code and Cursor share one source of truth.
+
+**In Cursor Agent chat:**
+
+- Ask to create a module, or run slash command **create-module** (spawns
+  researchers → reviewer → PI write/validate).
+- Run **paper-scout** to triage papers before authoring.
+- Solo path: ask the agent to Task `module-creator` (reads
+  `.claude/agents/module-creator.md`).
+
+If you prefer installing the MCP package without cloning:
 
 ```json
 {
@@ -209,36 +230,30 @@ The MCP server reads configuration from environment variables with the
 | `DNA_AGENTS_MCP_OUTPUT_DIR` | `.` | Default output directory for compiled parquet files |
 | `DNA_AGENTS_MCP_RESOLVE_WITH_ENSEMBL` | `true` | Resolve missing rsid/position via Ensembl DuckDB |
 
-## Claude Code agents and workflows
+## Agents and workflows (Claude Code + Cursor)
 
-When working in this repository with [Claude Code](https://docs.anthropic.com/en/docs/claude-code),
-pre-built agent definitions and a multi-agent workflow are available:
+Pre-built agent definitions live in [`.claude/agents/`](.claude/agents/) and are
+shared by Claude Code and Cursor. Do not duplicate them under `.cursor/`.
 
 ### Agents
 
-| Agent | Invoke with | Description |
-|-------|-------------|-------------|
-| Paper Scout | `@paper-scout` | Deep-research agent that finds and triages papers suitable for module creation. Classifies papers by type, filters out reviews/PRS/expression-only studies, flags supplementary data. |
-| Module Creator | `@module-creator` | Solo agent that creates a complete module from a paper, variant list, or freeform description. Has access to BioContext KB tools. |
-| Researcher | `@researcher` | Genetics researcher subagent — variant analysis, literature search, genotype assessment |
-| Reviewer | `@reviewer` | Quality reviewer subagent — checks provenance, data integrity, scientific accuracy |
+| Agent | Claude Code | Cursor | Description |
+|-------|-------------|--------|-------------|
+| Paper Scout | `@paper-scout` | slash **paper-scout** / Task `paper-scout` | Triage papers for extractable SNP data |
+| Module Creator | `@module-creator` | Task `module-creator` | Solo end-to-end module authoring |
+| Researcher | `@researcher` | Task `researcher` | Variant analysis + PMID collection |
+| Reviewer | `@reviewer` | Task `reviewer` | Quality / consensus review |
 
 ### Multi-agent workflow
 
-The `create-module` workflow orchestrates a full research team:
+Full research team: parallel researchers → reviewer → PI writes the spec.
 
-1. **3 Researcher agents** run in parallel, each analyzing variants from
-   different angles
-2. **Reviewer agent** checks the researchers' findings for errors and gaps
-3. **PI agent** synthesizes everything into the final module spec
+| Tool | How to run |
+|------|------------|
+| Claude Code | `/workflow create-module` |
+| Cursor | slash command **create-module** (see `.cursor/commands/create-module.md`) |
 
-Run it from Claude Code:
-
-```
-/workflow create-module
-```
-
-Or use `@module-creator` for a simpler single-agent flow.
+Solo alternative: `@module-creator` (Claude Code) or Task `module-creator` (Cursor).
 
 ### AGENTS.md (cross-tool instructions)
 
@@ -424,12 +439,17 @@ dna-agents/
 │       └── cli.py                  # Typer CLI
 │
 ├── .claude/
-│   ├── agents/                     # Claude Code agent definitions
+│   ├── agents/                     # shared agent prompts (Claude Code + Cursor)
 │   │   ├── module-creator.md
+│   │   ├── paper-scout.md
 │   │   ├── researcher.md
 │   │   └── reviewer.md
 │   └── workflows/
-│       └── create-module.js        # multi-agent orchestration
+│       └── create-module.js        # Claude Code multi-agent orchestration
+│
+├── .cursor/                        # portable Cursor config only (local state gitignored)
+│   ├── rules/                      # always-on genetics + module-creation rules
+│   └── commands/                   # slash commands: create-module, paper-scout
 │
 └── tests/
     ├── test_module_compiler.py     # 27 unit + 34 integration tests
