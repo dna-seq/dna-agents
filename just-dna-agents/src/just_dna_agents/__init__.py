@@ -1,5 +1,5 @@
 """
-dna-agents: agent definitions and tooling for DNA annotation module creation.
+just-dna-agents: agent definitions and tooling for DNA annotation module creation.
 
 The module spec schema and compiler now live in the shared libraries — import them directly:
 

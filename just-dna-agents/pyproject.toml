@@ -1,27 +1,30 @@
 [project]
-name = "dna-agents-mcp"
+name = "just-dna-agents"
 version = "0.4.0"
-description = "MCP server for DNA module compiler tools"
+description = "Module compiler and agent definitions for DNA annotation"
 authors = [
     { name = "antonkulaga", email = "antonkulaga@gmail.com" }
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "dna-agents",
     "just-dna-format>=0.4.0",
     "just-dna-compiler>=0.4.0",
-    "fastmcp[tasks]>=3.4.2",
-    "pydantic-settings>=2.14.2",
-    "python-dotenv>=1.2.2",
+    "huggingface-hub>=0.27.0",
+    "polars>=1.42.1",
+    "pyyaml>=6.0.3",
     "typer>=0.26.8",
+    "rich>=15.0.0",
+    "httpx>=0.28.0",
 ]
 
 [project.scripts]
-dna-agents-mcp = "dna_agents_mcp.cli:app"
-
-[tool.uv.sources]
-dna-agents = { workspace = true }
+just-dna-agents = "just_dna_agents.cli:app"
 
 [build-system]
 requires = ["uv_build>=0.10.0,<0.11.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

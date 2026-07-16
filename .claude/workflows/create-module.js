@@ -225,7 +225,7 @@ NOT nested under module:):
 
 (Call the MCP get_spec_format tool if unsure of any column or the authorship shape.)
 
-Then validate the module with: uv run dna-agents validate ${outputDir}/<module_name>/
+Then validate the module with: uv run just-dna-agents validate ${outputDir}/<module_name>/
 
 Use epistemic humility in all conclusions. This is Research Use Only.`
 

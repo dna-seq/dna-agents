@@ -1,11 +1,11 @@
 ---
-name: dna-agents-mcp
-description: MCP server for DNA annotation module compiler tools. Use when configuring or running the dna-agents-mcp server, connecting it to Claude Code, Cursor, or other MCP clients.
+name: just-dna-agents-mcp
+description: MCP server for DNA annotation module compiler tools. Use when configuring or running the just-dna-agents-mcp server, connecting it to Claude Code, Cursor, or other MCP clients.
 ---
 
-# dna-agents-mcp — MCP Server
+# just-dna-agents-mcp — MCP Server
 
-FastMCP server that exposes the dna-agents module compiler as MCP tools.
+FastMCP server that exposes the just-dna-agents module compiler as MCP tools.
 Lets AI coding assistants validate and compile genetics annotation modules
 without importing the library directly.
 
@@ -14,15 +14,15 @@ without importing the library directly.
 ### stdio transport (Claude Code, Cursor, Windsurf)
 
 ```bash
-uv run dna-agents-mcp serve
+uv run just-dna-agents-mcp serve
 # or explicitly:
-uv run dna-agents-mcp serve --transport stdio
+uv run just-dna-agents-mcp serve --transport stdio
 ```
 
 ### HTTP transport (remote access, Antigravity)
 
 ```bash
-uv run dna-agents-mcp serve --transport http --host 0.0.0.0 --port 8000
+uv run just-dna-agents-mcp serve --transport http --host 0.0.0.0 --port 8000
 ```
 
 ## Connecting to AI tools
@@ -34,10 +34,10 @@ Add to your project's `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "dna-agents-mcp": {
+    "just-dna-agents-mcp": {
       "type": "stdio",
       "command": "uv",
-      "args": ["run", "dna-agents-mcp", "serve", "--transport", "stdio"]
+      "args": ["run", "just-dna-agents-mcp", "serve", "--transport", "stdio"]
     }
   }
 }
@@ -54,10 +54,10 @@ For full variant research capabilities, also connect BioContext KB:
       "type": "url",
       "url": "https://biocontext-kb.fastmcp.app/mcp"
     },
-    "dna-agents-mcp": {
+    "just-dna-agents-mcp": {
       "type": "stdio",
       "command": "uv",
-      "args": ["run", "dna-agents-mcp", "serve", "--transport", "stdio"]
+      "args": ["run", "just-dna-agents-mcp", "serve", "--transport", "stdio"]
     }
   }
 }
@@ -103,12 +103,12 @@ Return valid hex colors and their semantic uses for module_spec.yaml
 
 ## Configuration
 
-Environment variables (prefix `DNA_AGENTS_MCP_`):
+Environment variables (prefix `JUST_DNA_AGENTS_MCP_`):
 
 | Variable                          | Default | Description |
 |-----------------------------------|---------|-------------|
-| `DNA_AGENTS_MCP_OUTPUT_DIR`       | `.`     | Default output directory for compiled modules |
-| `DNA_AGENTS_MCP_RESOLVE_WITH_ENSEMBL` | `true` | Auto-resolve rsid/coordinates via Ensembl DuckDB |
+| `JUST_DNA_AGENTS_MCP_OUTPUT_DIR`       | `.`     | Default output directory for compiled modules |
+| `JUST_DNA_AGENTS_MCP_RESOLVE_WITH_ENSEMBL` | `true` | Auto-resolve rsid/coordinates via Ensembl DuckDB |
 
 Or use a `.env` file in the project root.
 
@@ -118,8 +118,8 @@ The server also exposes direct CLI commands (no MCP needed):
 
 ```bash
 # Validate a spec directory
-uv run dna-agents-mcp validate /path/to/spec/
+uv run just-dna-agents-mcp validate /path/to/spec/
 
 # Compile to parquet
-uv run dna-agents-mcp compile /path/to/spec/ --output /path/to/output/
+uv run just-dna-agents-mcp compile /path/to/spec/ --output /path/to/output/
 ```

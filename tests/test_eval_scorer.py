@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from dna_agents.eval_scorer import score_module
+from just_dna_agents.eval_scorer import score_module
 
 EVALS_DIR = Path(__file__).parent.parent / "data" / "evals"
 
@@ -174,7 +174,7 @@ class TestEvalScorerParquet:
 
     def test_score_against_downloaded_parquet(self, tmp_path):
         """Download a module, reverse it, and score the reversed spec against itself."""
-        from dna_agents.modules import download_module
+        from just_dna_agents.modules import download_module
 
         result = download_module("longevitymap", tmp_path / "parquet")
         if not result.success:
@@ -191,7 +191,7 @@ class TestEvalScorerParquet:
 
     def test_score_against_hf_module(self, tmp_path):
         """Score a reversed spec against HF module directly."""
-        from dna_agents.modules import download_module
+        from just_dna_agents.modules import download_module
         from just_dna_compiler.compiler import reverse_module
 
         result = download_module("longevitymap", tmp_path / "parquet")

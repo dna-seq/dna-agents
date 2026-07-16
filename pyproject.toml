@@ -1,5 +1,5 @@
 [project]
-name = "dna-agents-workspace"
+name = "just-dna-agents-workspace"
 version = "0.4.0"
 description = "DNA annotation agents workspace"
 requires-python = ">=3.14"
@@ -8,19 +8,19 @@ dependencies = [
 ]
 
 [tool.uv.workspace]
-members = ["dna-agents", "dna-agents-mcp"]
+members = ["just-dna-agents", "just-dna-agents-mcp"]
 
 [tool.uv]
 default-groups = ["dev"]
 
 [tool.uv.sources]
-dna-agents = { workspace = true }
-dna-agents-mcp = { workspace = true }
+just-dna-agents = { workspace = true }
+just-dna-agents-mcp = { workspace = true }
 
 [dependency-groups]
 dev = [
-    "dna-agents",
-    "dna-agents-mcp",
+    "just-dna-agents",
+    "just-dna-agents-mcp",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "python-dotenv>=1.2.2",

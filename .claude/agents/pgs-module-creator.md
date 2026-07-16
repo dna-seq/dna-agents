@@ -97,7 +97,7 @@ source citation in the `note` field instead.
 3. Prefer scores with reported validation ancestry; flag single-ancestry scores as
    `research_only` unless a multi-ancestry calibration is published (`calibrated`).
 4. Write the spec files, then validate:
-   `uv run dna-agents validate <spec_dir>`
+   `uv run just-dna-agents validate <spec_dir>`
 5. Fix errors and re-validate. Write MODULE.md documenting the scores and their
    ancestry caveats.
 

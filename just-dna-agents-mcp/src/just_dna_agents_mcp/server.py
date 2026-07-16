@@ -1,5 +1,5 @@
 """
-FastMCP server wrapping the dna_agents module compiler tools.
+FastMCP server wrapping the just_dna_agents module compiler tools.
 
 Exposes validation, compilation, spec format reference, and
 icon/color listing as MCP tools.
@@ -17,7 +17,7 @@ from typing import Any
 from fastmcp import FastMCP
 from fastmcp.utilities.tasks import TaskConfig
 
-from dna_agents_mcp.config import Settings, get_settings
+from just_dna_agents_mcp.config import Settings, get_settings
 
 # Every tool may run synchronously or be promoted to a background task
 # by the client (the MCP background-task protocol).
@@ -28,7 +28,7 @@ def create_server(settings: Settings | None = None) -> FastMCP:
     """Build and configure the DNA Agents MCP server."""
     settings = settings or get_settings()
     mcp: FastMCP = FastMCP(
-        "dna-agents-mcp",
+        "just-dna-agents-mcp",
         instructions=(
             "DNA annotation module compiler tools. Validate and compile module "
             "spec directories into deployable parquet files. As of just-dna-format "

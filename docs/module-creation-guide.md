@@ -171,7 +171,7 @@ After the agent creates a module, verify:
 - [ ] **Identifiers are real** — rsids exist in dbSNP / `PGSxxxxxx` ids exist in the PGS Catalog / star-alleles come from PharmVar (never invented)
 - [ ] **PMIDs are real** — study references exist in PubMed (never invented)
 - [ ] **Language is cautious** — "associated with", not "causes"
-- [ ] **Validation passes** — run `dna-agents validate <module_dir>/`
+- [ ] **Validation passes** — run `just-dna-agents validate <module_dir>/`
 
 SNP modules additionally:
 
@@ -195,5 +195,5 @@ SNP modules additionally:
 /workflow create-module {"task": "Create a cardiac arrhythmia module from these variants: rs1805124, rs12143842, rs10428132"}
 
 # 4. Validate the output
-dna-agents validate module_output/cardiac_arrhythmia/
+just-dna-agents validate module_output/cardiac_arrhythmia/
 ```

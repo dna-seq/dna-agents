@@ -1,7 +1,7 @@
 """
 Smoke tests for the library-backed compiler seam.
 
-After retiring the local spec/compiler, dna-agents consumes just-dna-format + just-dna-compiler
+After retiring the local spec/compiler, just-dna-agents consumes just-dna-format + just-dna-compiler
 directly. These tests confirm the imports resolve to the libraries (including the 0.4 composed table
 kinds and the live authoring reference) and that an offline compile of a bundled fixture produces the
 expected artifact (the SNP-core parquet tables + manifest.json).
@@ -68,7 +68,7 @@ def test_mcp_server_reference_tools_use_live_format():
     # hand-maintained copy (the drift just_dna_format.reference exists to prevent).
     from just_dna_format.manifest import RECOMMENDED_COLORS, RECOMMENDED_ICONS
 
-    from dna_agents_mcp.server import create_server
+    from just_dna_agents_mcp.server import create_server
 
     create_server()  # must build without a hardcoded palette/reference
     assert "protective" in RECOMMENDED_COLORS
@@ -77,7 +77,7 @@ def test_mcp_server_reference_tools_use_live_format():
 
 def test_resolver_helper_is_provisioning_only():
     # The local resolver is now a thin provisioning wrapper; resolution lives in the library.
-    from dna_agents.resolver import ensure_resolver_reference  # noqa: F401
+    from just_dna_agents.resolver import ensure_resolver_reference  # noqa: F401
 
 
 def test_validate_fixture(tmp_path):

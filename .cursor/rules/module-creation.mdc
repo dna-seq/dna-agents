@@ -19,8 +19,8 @@ Shared agent prompts live in `.claude/agents/` (single source of truth — do no
 ## After writing specs
 
 ```bash
-uv run dna-agents validate <spec_dir>/
-uv run dna-agents compile <spec_dir>/ -o <output_dir>/
+uv run just-dna-agents validate <spec_dir>/
+uv run just-dna-agents compile <spec_dir>/ -o <output_dir>/
 ```
 
 Use MCP `validate_spec` / `compile_module` / `get_spec_format` when connected. BioContext KB for Ensembl + EuropePMC.

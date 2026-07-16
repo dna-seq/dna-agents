@@ -8,12 +8,12 @@ load_dotenv()
 class Settings(BaseSettings):
     """Runtime configuration for the DNA Agents MCP server.
 
-    Values can be overridden via ``DNA_AGENTS_MCP_*`` environment variables or a
+    Values can be overridden via ``JUST_DNA_AGENTS_MCP_*`` environment variables or a
     local ``.env`` file.
     """
 
     model_config = SettingsConfigDict(
-        env_prefix="DNA_AGENTS_MCP_",
+        env_prefix="JUST_DNA_AGENTS_MCP_",
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",

@@ -1,9 +1,9 @@
 ---
-name: dna-agents
+name: just-dna-agents
 description: DNA annotation module compiler. Use when creating, validating, or compiling genetics annotation modules (SNP core module_spec.yaml + variants.csv + studies.csv, and/or the 0.4 table kinds). Ensures correct spec format, GRCh38 coordinates, epistemic humility in conclusions, and proper weight conventions.
 ---
 
-# dna-agents — Module Compiler
+# just-dna-agents — Module Compiler
 
 Genetics annotation module compiler for the just-dna-lite platform. Validates
 and compiles module spec directories into deployable parquet files.
@@ -11,7 +11,7 @@ and compiles module spec directories into deployable parquet files.
 > **Authoritative field reference — always prefer this over the tables below.**
 > The spec is defined by the `just-dna-format` library, and the exact current
 > field/vocabulary set is served live (it cannot drift from what the compiler
-> enforces). When the `dna-agents-mcp` server is connected, call:
+> enforces). When the `just-dna-agents-mcp` server is connected, call:
 > - **`get_spec_format`** — compact reference: every model's fields
 >   (name/type/required/description), vocabularies, reserved names, recommended
 >   palette. Covers the SNP core **and** all 0.4 table kinds.
@@ -35,7 +35,7 @@ error** (`extra="forbid"`), so match column names exactly (via `get_spec_format`
 ## Quick start
 
 ```python
-from dna_agents import validate_spec, compile_module
+from just_dna_agents import validate_spec, compile_module
 
 result = validate_spec(Path("my_module/"))
 if result.valid:
@@ -46,10 +46,10 @@ CLI:
 
 ```bash
 # Validate a spec directory
-uv run dna-agents validate path/to/spec/
+uv run just-dna-agents validate path/to/spec/
 
 # Compile to parquet
-uv run dna-agents compile path/to/spec/ --output path/to/output/
+uv run just-dna-agents compile path/to/spec/ --output path/to/output/
 ```
 
 ## Module spec directory format (SNP core)
@@ -260,7 +260,7 @@ rs1801133,9215008,European,1e-10,"C677T homozygosity associated with elevated pl
 ## Validation API
 
 ```python
-from dna_agents import validate_spec, ValidationResult
+from just_dna_agents import validate_spec, ValidationResult
 
 result: ValidationResult = validate_spec(Path("my_module/"))
 # result.valid: bool
@@ -272,7 +272,7 @@ result: ValidationResult = validate_spec(Path("my_module/"))
 ## Compilation API
 
 ```python
-from dna_agents import compile_module, CompilationResult
+from just_dna_agents import compile_module, CompilationResult
 
 result: CompilationResult = compile_module(
     spec_dir=Path("my_module/"),

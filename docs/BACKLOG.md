@@ -70,7 +70,7 @@ Status legend: ✅ done · 🔜 next · ⏸ deferred · 💡 idea
   (`aggregate.py`): expose module signing / multi-manifest provenance summaries via
   the CLI/MCP once there's a consumer for them.
 - 💡 **`derive.py` upgrade path**: legacy `state` → (`direction`, `stat_significance`)
-  derivation exists in the library; consider a `dna-agents upgrade` command to
+  derivation exists in the library; consider a `just-dna-agents upgrade` command to
   migrate older specs to the orthogonal axes.
 
 ## Done (for reference)

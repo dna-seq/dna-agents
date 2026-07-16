@@ -6,8 +6,8 @@ Genetics annotation module builder for the just-dna-lite platform.
 
 uv workspace with two members:
 
-- `dna-agents/` — module compiler library (`dna_agents` package)
-- `dna-agents-mcp/` — FastMCP server (`dna_agents_mcp` package)
+- `just-dna-agents/` — module compiler library (`just_dna_agents` package)
+- `just-dna-agents-mcp/` — FastMCP server (`just_dna_agents_mcp` package)
 
 ## Commands
 
@@ -22,37 +22,37 @@ uv run pytest
 uv run pytest -m "not integration"
 
 # Validate a module spec
-uv run dna-agents validate /path/to/spec/
+uv run just-dna-agents validate /path/to/spec/
 
 # Compile a module (auto-resolves rsid <-> GRCh38 coordinates via Ensembl DuckDB)
-uv run dna-agents compile /path/to/spec/ -o /path/to/output/
+uv run just-dna-agents compile /path/to/spec/ -o /path/to/output/
 
 # Download papers from EuropePMC for a module's studies.csv
-uv run dna-agents download-papers data/evals/cyp_panel/
+uv run just-dna-agents download-papers data/evals/cyp_panel/
 
 # Download HF annotator modules (parquet files)
-uv run dna-agents download-modules
+uv run just-dna-agents download-modules
 
 # Download a single module with reverse-compile to spec format
-uv run dna-agents download-modules -m longevitymap --reverse
+uv run just-dna-agents download-modules -m longevitymap --reverse
 
 # List available HF modules
-uv run dna-agents download-modules --list
+uv run just-dna-agents download-modules --list
 
 # Score agent output against local ground truth
-uv run dna-agents eval candidate_output/ data/evals/cyp_panel/
+uv run just-dna-agents eval candidate_output/ data/evals/cyp_panel/
 
 # Score against HF module directly (preferred for modules on HF)
-uv run dna-agents eval agent_output/ longevitymap --rsids rs3758391,rs107251
+uv run just-dna-agents eval agent_output/ longevitymap --rsids rs3758391,rs107251
 
 # Run agent evals (requires claude CLI)
 uv run pytest tests/test_agent_evals.py -v -m agent_eval
 
 # Start MCP server (stdio)
-uv run dna-agents-mcp serve
+uv run just-dna-agents-mcp serve
 
 # Start MCP server (HTTP)
-uv run dna-agents-mcp serve --transport http --port 8000
+uv run just-dna-agents-mcp serve --transport http --port 8000
 ```
 
 ## Critical rules

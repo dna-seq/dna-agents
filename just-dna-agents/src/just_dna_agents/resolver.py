@@ -1,5 +1,5 @@
 """
-App-side Ensembl reference provisioning for the dna-agents compiler.
+App-side Ensembl reference provisioning for the just-dna-agents compiler.
 
 The actual rsid <-> position resolution lives in ``just_dna_compiler.resolver`` (inject-only:
 it never downloads). This module is the *provisioning* layer the library intentionally omits —

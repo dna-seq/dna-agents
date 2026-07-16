@@ -1,9 +1,9 @@
 ---
-description: Critical genetics annotation rules for dna-agents modules (GRCh38, alleles, PMIDs, humility)
+description: Critical genetics annotation rules for just-dna-agents modules (GRCh38, alleles, PMIDs, humility)
 alwaysApply: true
 ---
 
-# dna-agents — critical rules
+# just-dna-agents — critical rules
 
 Research Use Only. Modules are for just-dna-lite annotation, not clinical advice.
 
@@ -19,4 +19,4 @@ Research Use Only. Modules are for just-dna-lite annotation, not clinical advice
 10. **studies.csv is mandatory** for SNP modules.
 
 Authoritative format: `AGENTS.md` and MCP `get_spec_format`. Prefer MCP when available.
-Validate with: `uv run dna-agents validate <spec_dir>/`
+Validate with: `uv run just-dna-agents validate <spec_dir>/`

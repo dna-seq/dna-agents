@@ -1,5 +1,5 @@
 """
-CLI for the dna-agents module compiler.
+CLI for the just-dna-agents module compiler.
 
 Provides Typer commands for validating, compiling, and serving
 module specs via MCP.
@@ -14,7 +14,7 @@ from rich.console import Console
 from rich.table import Table
 
 app = typer.Typer(
-    name="dna-agents",
+    name="just-dna-agents",
     help="DNA annotation module compiler: validate, compile, and serve module specs.",
     no_args_is_help=True,
 )
@@ -45,7 +45,7 @@ def validate(
 
     Examples:
 
-        dna-agents validate data/module_specs/evals/mthfr_nad/
+        just-dna-agents validate data/module_specs/evals/mthfr_nad/
     """
     from just_dna_compiler.compiler import validate_spec
 
@@ -124,12 +124,12 @@ def compile_cmd(
 
     Examples:
 
-        dna-agents compile data/module_specs/evals/mthfr_nad/
+        just-dna-agents compile data/module_specs/evals/mthfr_nad/
 
-        dna-agents compile data/module_specs/evals/cyp_panel/ \\
+        just-dna-agents compile data/module_specs/evals/cyp_panel/ \\
             --output data/output/modules/cyp_panel/
 
-        dna-agents compile data/module_specs/evals/cyp_panel/ --no-resolve
+        just-dna-agents compile data/module_specs/evals/cyp_panel/ --no-resolve
     """
     from just_dna_compiler.compiler import compile_module
 
@@ -154,7 +154,7 @@ def compile_cmd(
     # warning rather than failing.
     reference = ensembl_cache
     if resolve:
-        from dna_agents.resolver import ensure_resolver_reference
+        from just_dna_agents.resolver import ensure_resolver_reference
 
         reference = ensure_resolver_reference(ensembl_cache)
 
@@ -222,11 +222,11 @@ def download_papers_cmd(
 
     Examples:
 
-        dna-agents download-papers data/evals/cyp_panel/
+        just-dna-agents download-papers data/evals/cyp_panel/
 
-        dna-agents download-papers data/evals/sirtuin_longevity/ -o papers/sirtuin/
+        just-dna-agents download-papers data/evals/sirtuin_longevity/ -o papers/sirtuin/
     """
-    from dna_agents.papers import download_papers, extract_pmids
+    from just_dna_agents.papers import download_papers, extract_pmids
 
     pmids = extract_pmids(spec_dir)
     if not pmids:
@@ -303,15 +303,15 @@ def download_modules_cmd(
 
     Examples:
 
-        dna-agents download-modules --list
+        just-dna-agents download-modules --list
 
-        dna-agents download-modules
+        just-dna-agents download-modules
 
-        dna-agents download-modules -m longevitymap --reverse
+        just-dna-agents download-modules -m longevitymap --reverse
 
-        dna-agents download-modules --reverse --spec-output data/ground_truth/
+        just-dna-agents download-modules --reverse --spec-output data/ground_truth/
     """
-    from dna_agents.modules import (
+    from just_dna_agents.modules import (
         discover_modules,
         download_all_modules,
         download_module,
@@ -389,13 +389,13 @@ def eval_cmd(
 
     Examples:
 
-        dna-agents eval agent_output/ data/evals/cyp_panel/
+        just-dna-agents eval agent_output/ data/evals/cyp_panel/
 
-        dna-agents eval agent_output/ longevitymap --rsids rs3758391,rs107251
+        just-dna-agents eval agent_output/ longevitymap --rsids rs3758391,rs107251
 
-        dna-agents eval agent_output/ data/modules/longevitymap/
+        just-dna-agents eval agent_output/ data/modules/longevitymap/
     """
-    from dna_agents.eval_scorer import score_module
+    from just_dna_agents.eval_scorer import score_module
 
     rsids = None
     if rsid_filter:
@@ -435,7 +435,7 @@ def serve(
     port: int = typer.Option(8000, help="Port for the HTTP transport."),
 ) -> None:
     """Run the MCP server over stdio or streamable HTTP."""
-    from dna_agents_mcp.server import create_server
+    from just_dna_agents_mcp.server import create_server
 
     mcp = create_server()
     if transport is Transport.stdio:

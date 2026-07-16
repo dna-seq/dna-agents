@@ -178,7 +178,7 @@ rs3892097,CYP2D6,codeine,"reduced morphine formation",1A,"CYP2D6*4 defining vari
    keep star-strings verbatim from PharmVar.
 4. For `activity_phenotype.csv`: ensure bins don't overlap and add the single
    `unresolved` sentinel row.
-5. Write the spec files, then validate: `uv run dna-agents validate <spec_dir>`.
+5. Write the spec files, then validate: `uv run just-dna-agents validate <spec_dir>`.
    Fix errors and re-validate. Write MODULE.md citing CPIC/PharmVar/PharmGKB.
 
 ## Epistemic humility (MANDATORY)

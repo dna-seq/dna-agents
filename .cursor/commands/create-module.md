@@ -12,11 +12,11 @@ Create a just-dna-lite SNP annotation module from the user's request (paper, var
    - `variants.csv`
    - `studies.csv`
    - `MODULE.md`
-5. Validate: `uv run dna-agents validate <output_dir>/<module_name>/`
-6. Fix until valid. Optionally compile: `uv run dna-agents compile … -o …`
+5. Validate: `uv run just-dna-agents validate <output_dir>/<module_name>/`
+6. Fix until valid. Optionally compile: `uv run just-dna-agents compile … -o …`
 
 ## Rules
 
-Follow `AGENTS.md` and `.cursor/rules/dna-agents-critical.mdc`. GRCh38, forward-strand alleles, verified PMIDs, epistemic humility.
+Follow `AGENTS.md` and `.cursor/rules/just-dna-agents-critical.mdc`. GRCh38, forward-strand alleles, verified PMIDs, epistemic humility.
 
 For a faster solo path, Task `module-creator` once instead of the full team.

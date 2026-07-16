@@ -27,11 +27,11 @@ Overall score is a weighted average, 0–100%. Pass threshold: **70%**.
 
 Ground truth can be loaded from three sources:
 
-1. **HF parquet modules** (preferred): `dna-agents eval output/ longevitymap --rsids rs3758391,rs107251`
+1. **HF parquet modules** (preferred): `just-dna-agents eval output/ longevitymap --rsids rs3758391,rs107251`
    Loads weights.parquet + annotations.parquet + studies.parquet directly from
    `just-dna-seq/annotators`. Use `--rsids` to restrict to a subset.
-2. **Local parquet**: `dna-agents eval output/ data/modules/longevitymap/`
-3. **Spec directory**: `dna-agents eval output/ data/evals/cyp_panel/`
+2. **Local parquet**: `just-dna-agents eval output/ data/modules/longevitymap/`
+3. **Spec directory**: `just-dna-agents eval output/ data/evals/cyp_panel/`
    for modules not on HF (e.g. pharmacogenomics).
 
 ### Eval cases
@@ -65,7 +65,7 @@ Additional test fixtures in `tests/fixtures/evals/` (mthfr_nad, cyp_panel).
 
 ```bash
 # Download module and reverse-compile to spec format
-uv run dna-agents download-modules -m longevitymap --reverse
+uv run just-dna-agents download-modules -m longevitymap --reverse
 ```
 
 ## Paper Downloader
@@ -74,13 +74,13 @@ Download the actual papers referenced in eval data for context grounding:
 
 ```bash
 # Download metadata + open-access full text for all PMIDs in studies.csv
-uv run dna-agents download-papers data/evals/cyp_panel/
+uv run just-dna-agents download-papers data/evals/cyp_panel/
 
 # Metadata only (faster)
-uv run dna-agents download-papers data/evals/cyp_panel/ --no-fulltext
+uv run just-dna-agents download-papers data/evals/cyp_panel/ --no-fulltext
 
 # Custom output directory
-uv run dna-agents download-papers data/evals/sirtuin_longevity/ -o papers/sirtuin/
+uv run just-dna-agents download-papers data/evals/sirtuin_longevity/ -o papers/sirtuin/
 ```
 
 Output structure:
@@ -111,7 +111,7 @@ claude -p \
   "Read data/evals/cyp_panel/freeform_input.md and create a module \
    spec in eval_output/cyp_panel/. Include module_spec.yaml, \
    variants.csv, and studies.csv. Then validate with: \
-   uv run dna-agents validate eval_output/cyp_panel/"
+   uv run just-dna-agents validate eval_output/cyp_panel/"
 
 # Multi-agent workflow (PI + researchers + reviewer)
 claude -p \
@@ -125,10 +125,10 @@ claude -p \
 
 ```bash
 # Score against local spec ground truth
-uv run dna-agents eval eval_output/cyp_panel/ data/evals/cyp_panel/
+uv run just-dna-agents eval eval_output/cyp_panel/ data/evals/cyp_panel/
 
 # Score against HF module (preferred for modules on HF)
-uv run dna-agents eval eval_output/sirtuin/ longevitymap \
+uv run just-dna-agents eval eval_output/sirtuin/ longevitymap \
   --rsids rs3758391,rs12778366,rs7896005,rs4746720,rs11555236,rs4980329,rs107251
 ```
 
@@ -231,8 +231,8 @@ This runs create-module → scores → generates a report in `data/eval_output/`
 1. Create a new directory under `data/evals/<name>/`
 2. Write `freeform_input.md` — the prompt the agent will receive
 3. Create ground-truth `module_spec.yaml`, `variants.csv`, `studies.csv`
-4. Download papers: `uv run dna-agents download-papers data/evals/<name>/`
-5. Self-test: `uv run dna-agents eval data/evals/<name>/ data/evals/<name>/`
+4. Download papers: `uv run just-dna-agents download-papers data/evals/<name>/`
+5. Self-test: `uv run just-dna-agents eval data/evals/<name>/ data/evals/<name>/`
    (should score 100%)
 6. Add the eval name to the `EVAL_CASES` list in `tests/test_agent_evals.py`
 

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from dna_agents.papers import extract_pmids
+from just_dna_agents.papers import extract_pmids
 
 
 EVALS_DIR = Path(__file__).parent.parent / "data" / "evals"
@@ -44,7 +44,7 @@ class TestPaperDownload:
     """Integration tests requiring network access to EuropePMC."""
 
     def test_fetch_single_metadata(self):
-        from dna_agents.papers import fetch_paper_metadata
+        from just_dna_agents.papers import fetch_paper_metadata
 
         meta = fetch_paper_metadata("17622601")
         assert meta.pmid == "17622601"
@@ -53,7 +53,7 @@ class TestPaperDownload:
         assert meta.authors
 
     def test_download_to_dir(self, tmp_path):
-        from dna_agents.papers import download_papers
+        from just_dna_agents.papers import download_papers
 
         results = download_papers(["17622601"], tmp_path)
         assert len(results) == 1

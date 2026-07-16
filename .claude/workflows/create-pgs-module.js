@@ -22,7 +22,7 @@ Write a PGS module spec directory under ${outputDir}/<module_name>/:
 - NO studies.csv (PGS rows have no variant identifier — citations go in note)
 
 Call the MCP get_spec_format tool for the exact PgsRow columns. Then validate with
-  uv run dna-agents validate ${outputDir}/<module_name>/
+  uv run just-dna-agents validate ${outputDir}/<module_name>/
 and fix any errors until it passes. Report the final spec directory path.`
 
 const created = await agent(createPrompt, {

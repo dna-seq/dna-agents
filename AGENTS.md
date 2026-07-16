@@ -9,12 +9,12 @@ SNP genotype annotations packaged as `module_spec.yaml` + `variants.csv` +
 
 This is a **uv workspace** with two subprojects:
 
-- `dna-agents/` — core module compiler library (validate, compile, reverse)
-- `dna-agents-mcp/` — FastMCP server exposing compiler tools over MCP
+- `just-dna-agents/` — core module compiler library (validate, compile, reverse)
+- `just-dna-agents-mcp/` — FastMCP server exposing compiler tools over MCP
 
 ## Available MCP Tools
 
-When connected to the `dna-agents-mcp` server (or via the BioContext KB MCP),
+When connected to the `just-dna-agents-mcp` server (or via the BioContext KB MCP),
 these tools are available:
 
 - **validate_spec** — validate a module spec directory
@@ -166,40 +166,40 @@ is in hand.
 
 ```bash
 # Validate a spec directory
-uv run dna-agents validate /path/to/spec/
+uv run just-dna-agents validate /path/to/spec/
 
 # Compile to parquet
-uv run dna-agents compile /path/to/spec/ --output /path/to/output/
+uv run just-dna-agents compile /path/to/spec/ --output /path/to/output/
 
 # Download papers from EuropePMC for a module's studies.csv
-uv run dna-agents download-papers data/evals/cyp_panel/
+uv run just-dna-agents download-papers data/evals/cyp_panel/
 
 # Download HF annotator modules (parquet files)
-uv run dna-agents download-modules
+uv run just-dna-agents download-modules
 
 # Download a single module with reverse-compile to spec format
-uv run dna-agents download-modules -m longevitymap --reverse
+uv run just-dna-agents download-modules -m longevitymap --reverse
 
 # List available HF modules
-uv run dna-agents download-modules --list
+uv run just-dna-agents download-modules --list
 
 # Score agent output against local ground truth
-uv run dna-agents eval candidate_output/ data/evals/cyp_panel/
+uv run just-dna-agents eval candidate_output/ data/evals/cyp_panel/
 
 # Score agent output against HF module directly (best for modules on HF)
-uv run dna-agents eval agent_output/ longevitymap --rsids rs3758391,rs107251
+uv run just-dna-agents eval agent_output/ longevitymap --rsids rs3758391,rs107251
 
 # Score against downloaded parquet
-uv run dna-agents eval agent_output/ data/modules/longevitymap/
+uv run just-dna-agents eval agent_output/ data/modules/longevitymap/
 
 # Run agent evals (requires claude CLI)
 uv run pytest tests/test_agent_evals.py -v -m agent_eval
 
 # Run MCP server (stdio for Claude Code / Cursor)
-uv run dna-agents-mcp serve --transport stdio
+uv run just-dna-agents-mcp serve --transport stdio
 
 # Run MCP server (HTTP for remote access)
-uv run dna-agents-mcp serve --transport http --port 8000
+uv run just-dna-agents-mcp serve --transport http --port 8000
 ```
 
 ## Evaluation System
@@ -219,11 +219,11 @@ Agent output is scored against ground truth on 8 weighted dimensions:
 
 ### Ground truth sources
 
-- **HF parquet modules** (preferred): `dna-agents eval output/ longevitymap`
+- **HF parquet modules** (preferred): `just-dna-agents eval output/ longevitymap`
   loads weights.parquet + annotations.parquet + studies.parquet directly from
   `just-dna-seq/annotators`. Use `--rsids` to restrict to a subset.
-- **Local parquet**: `dna-agents eval output/ data/modules/longevitymap/`
-- **Spec directory**: `dna-agents eval output/ data/evals/cyp_panel/`
+- **Local parquet**: `just-dna-agents eval output/ data/modules/longevitymap/`
+- **Spec directory**: `just-dna-agents eval output/ data/evals/cyp_panel/`
   for modules not on HF (e.g. pharmacogenomics).
 
 ### Eval cases

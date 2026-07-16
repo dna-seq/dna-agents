@@ -1,5 +1,5 @@
 """
-CLI for the dna-agents-mcp server.
+CLI for the just-dna-agents-mcp server.
 
 Provides Typer commands for serving, validating, and compiling
 module specs.
@@ -35,7 +35,7 @@ def serve(
     port: int = typer.Option(8000, help="Port for the HTTP transport."),
 ) -> None:
     """Run the MCP server over stdio or streamable HTTP."""
-    from dna_agents_mcp.server import create_server
+    from just_dna_agents_mcp.server import create_server
 
     mcp = create_server()
     if transport is Transport.stdio:
@@ -133,7 +133,7 @@ def compile_cmd(
     """
     from just_dna_compiler.compiler import compile_module
 
-    from dna_agents_mcp.config import get_settings
+    from just_dna_agents_mcp.config import get_settings
 
     settings = get_settings()
 
@@ -154,7 +154,7 @@ def compile_cmd(
 
     reference = ensembl_cache
     if resolve:
-        from dna_agents.resolver import ensure_resolver_reference
+        from just_dna_agents.resolver import ensure_resolver_reference
 
         reference = ensure_resolver_reference(ensembl_cache)
 

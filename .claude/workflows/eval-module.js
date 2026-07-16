@@ -51,7 +51,7 @@ IMPORTANT:
 - Include ALL variants mentioned in the input
 - Include ALL PMIDs mentioned in the input
 - Write proper CSV files with headers matching the spec format
-- Validate the output with: uv run dna-agents validate ${outputDir}/
+- Validate the output with: uv run just-dna-agents validate ${outputDir}/
 
 The variants.csv core columns: rsid,genotype,weight,state,conclusion,gene,phenotype,category
 The studies.csv core columns: rsid,pmid,population,p_value,conclusion,study_design
@@ -72,7 +72,7 @@ const scoreResult = await agent(
   `Score the agent-produced module at ${outputDir}/ against the ground truth at ${evalDir}/.
 
 Run this command:
-uv run dna-agents eval ${outputDir}/ ${evalDir}/
+uv run just-dna-agents eval ${outputDir}/ ${evalDir}/
 
 Then also manually compare:
 1. Read ${outputDir}/variants.csv and ${evalDir}/variants.csv

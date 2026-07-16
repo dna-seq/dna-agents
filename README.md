@@ -1,11 +1,11 @@
-# dna-agents: Genetics Annotation Module Compiler
+# just-dna-agents: Genetics Annotation Module Compiler
 
 [![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
 [![Research use only](https://img.shields.io/badge/use-research%20only-orange.svg)](#research-use-only)
 [![Not medical advice](https://img.shields.io/badge/medical-not%20advice-red.svg)](#research-use-only)
 [![MCP ready](https://img.shields.io/badge/MCP-Claude%20%7C%20Cursor%20%7C%20Codex-blueviolet.svg)](#use-with-claude-cursor-codex-antigravity-or-other-agents)
 
-`dna-agents` is a genetics annotation module compiler for the
+`just-dna-agents` is a genetics annotation module compiler for the
 [just-dna-lite](https://github.com/dna-seq/just-dna-lite) platform. It
 validates and compiles curated SNP genotype annotations — packaged as
 `module_spec.yaml` + `variants.csv` + `studies.csv` — into deployable parquet
@@ -26,7 +26,7 @@ You can use it three ways:
   lists. The agent handles research, spec writing, validation, and compilation.
 - **From the CLI** — validate and compile module specs directly from the
   terminal.
-- **As a Python library** — import `dna_agents` for programmatic validation,
+- **As a Python library** — import `just_dna_agents` for programmatic validation,
   compilation, and Ensembl-based variant resolution.
 
 ## Contents
@@ -82,7 +82,7 @@ directly.
 ### Claude Code
 
 ```bash
-claude mcp add dna-agents-mcp -- uvx dna-agents-mcp serve --transport stdio
+claude mcp add just-dna-agents-mcp -- uvx just-dna-agents-mcp serve --transport stdio
 ```
 
 Or add to your project's `.mcp.json`:
@@ -90,10 +90,10 @@ Or add to your project's `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "dna-agents-mcp": {
+    "just-dna-agents-mcp": {
       "type": "stdio",
       "command": "uvx",
-      "args": ["dna-agents-mcp", "serve", "--transport", "stdio"]
+      "args": ["just-dna-agents-mcp", "serve", "--transport", "stdio"]
     }
   }
 }
@@ -106,9 +106,9 @@ Open **Settings > Developer > Edit Config** and add to `claude_desktop_config.js
 ```json
 {
   "mcpServers": {
-    "dna-agents-mcp": {
+    "just-dna-agents-mcp": {
       "command": "uvx",
-      "args": ["dna-agents-mcp", "serve", "--transport", "stdio"]
+      "args": ["just-dna-agents-mcp", "serve", "--transport", "stdio"]
     }
   }
 }
@@ -120,7 +120,7 @@ Restart Claude Desktop. The module compiler tools will appear in the tools menu
 ### Cursor
 
 This repo already ships a portable root [`.mcp.json`](.mcp.json) (`uv run`
-dna-agents-mcp + BioContext KB). Open the project in Cursor and the MCP servers
+just-dna-agents-mcp + BioContext KB). Open the project in Cursor and the MCP servers
 should load — no machine-specific `.cursor/mcp.json` required.
 
 Shared Cursor config (committed; safe for every clone):
@@ -146,9 +146,9 @@ If you prefer installing the MCP package without cloning:
 ```json
 {
   "mcpServers": {
-    "dna-agents-mcp": {
+    "just-dna-agents-mcp": {
       "command": "uvx",
-      "args": ["dna-agents-mcp", "serve", "--transport", "stdio"]
+      "args": ["just-dna-agents-mcp", "serve", "--transport", "stdio"]
     }
   }
 }
@@ -159,20 +159,20 @@ If you prefer installing the MCP package without cloning:
 Add to your Codex MCP server configuration:
 
 ```toml
-[mcp_servers.dna-agents-mcp]
+[mcp_servers.just-dna-agents-mcp]
 command = "uvx"
-args = ["dna-agents-mcp", "serve", "--transport", "stdio"]
+args = ["just-dna-agents-mcp", "serve", "--transport", "stdio"]
 ```
 
 ### Antigravity / other MCP clients
 
 Any MCP-capable assistant can connect using the server command:
-`uvx dna-agents-mcp serve --transport stdio`.
+`uvx just-dna-agents-mcp serve --transport stdio`.
 
 ### BioContext KB (recommended)
 
 For variant research, add the [BioContext KB](https://biocontext-kb.fastmcp.app)
-MCP server alongside `dna-agents-mcp`. It provides Ensembl, EuropePMC, UniProt,
+MCP server alongside `just-dna-agents-mcp`. It provides Ensembl, EuropePMC, UniProt,
 Open Targets, Reactome, KEGG, ClinicalTrials, AlphaFold, InterPro, OLS, and
 STRINGDb tools — everything an agent needs to research variants and find study
 references:
@@ -180,9 +180,9 @@ references:
 ```json
 {
   "mcpServers": {
-    "dna-agents-mcp": {
+    "just-dna-agents-mcp": {
       "command": "uvx",
-      "args": ["dna-agents-mcp", "serve", "--transport", "stdio"]
+      "args": ["just-dna-agents-mcp", "serve", "--transport", "stdio"]
     },
     "biocontext-kb": {
       "type": "url",
@@ -223,12 +223,12 @@ any errors, and compile with `compile_module`.
 ### Environment variables
 
 The MCP server reads configuration from environment variables with the
-`DNA_AGENTS_MCP_` prefix:
+`JUST_DNA_AGENTS_MCP_` prefix:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DNA_AGENTS_MCP_OUTPUT_DIR` | `.` | Default output directory for compiled parquet files |
-| `DNA_AGENTS_MCP_RESOLVE_WITH_ENSEMBL` | `true` | Resolve missing rsid/position via Ensembl DuckDB |
+| `JUST_DNA_AGENTS_MCP_OUTPUT_DIR` | `.` | Default output directory for compiled parquet files |
+| `JUST_DNA_AGENTS_MCP_RESOLVE_WITH_ENSEMBL` | `true` | Resolve missing rsid/position via Ensembl DuckDB |
 
 ## Agents and workflows (Claude Code + Cursor)
 
@@ -284,10 +284,10 @@ Each fixture lives at `tests/fixtures/evals/<name>/` and contains:
 
 ```bash
 # Validate a ground-truth fixture
-dna-agents validate tests/fixtures/evals/mthfr_nad/
+just-dna-agents validate tests/fixtures/evals/mthfr_nad/
 
 # Compile it to parquet
-dna-agents compile tests/fixtures/evals/cyp_panel/ -o /tmp/cyp_output/
+just-dna-agents compile tests/fixtures/evals/cyp_panel/ -o /tmp/cyp_output/
 ```
 
 ### Run an eval with the agent workflow (Claude Code)
@@ -344,27 +344,27 @@ and auto-download on first use.
 
 ```bash
 # Validate a module spec directory
-dna-agents validate /path/to/my_module/
+just-dna-agents validate /path/to/my_module/
 
 # Compile to parquet (auto-resolves missing rsid/position via Ensembl)
-dna-agents compile /path/to/my_module/
+just-dna-agents compile /path/to/my_module/
 
 # Compile with explicit output directory
-dna-agents compile /path/to/my_module/ --output /path/to/output/
+just-dna-agents compile /path/to/my_module/ --output /path/to/output/
 
 # Compile without Ensembl resolution
-dna-agents compile /path/to/my_module/ --no-resolve
+just-dna-agents compile /path/to/my_module/ --no-resolve
 
 # Run the MCP server directly
-dna-agents-mcp serve                              # stdio (default)
-dna-agents-mcp serve --transport http --port 8000  # HTTP
+just-dna-agents-mcp serve                              # stdio (default)
+just-dna-agents-mcp serve --transport http --port 8000  # HTTP
 ```
 
 ### Python
 
 ```python
 from pathlib import Path
-from dna_agents.compiler import validate_spec, compile_module
+from just_dna_agents.compiler import validate_spec, compile_module
 
 # Validate
 result = validate_spec(Path("my_module/"))
@@ -386,24 +386,24 @@ Requires Python >= 3.14 and [uv](https://github.com/astral-sh/uv).
 **As an MCP server (no clone needed):**
 
 ```bash
-uvx dna-agents-mcp serve --transport stdio
+uvx just-dna-agents-mcp serve --transport stdio
 ```
 
 **As a CLI tool:**
 
 ```bash
-uv tool install dna-agents
-dna-agents validate /path/to/spec/
+uv tool install just-dna-agents
+just-dna-agents validate /path/to/spec/
 ```
 
 **From source (development):**
 
 ```bash
-git clone https://github.com/dna-seq/dna-agents.git
-cd dna-agents
+git clone https://github.com/dna-seq/just-dna-agents.git
+cd just-dna-agents
 uv sync                     # installs both subprojects + dev deps
 uv run pytest               # run tests
-uv run dna-agents validate  # use the CLI
+uv run just-dna-agents validate  # use the CLI
 ```
 
 ## Project structure
@@ -412,28 +412,28 @@ This is a **uv workspace** with two subprojects:
 
 | Package | Directory | Description |
 |---------|-----------|-------------|
-| **dna-agents** | `dna-agents/` | Core library: module spec validation, compilation to parquet, Ensembl rsid/position resolver, reverse engineering from existing modules. CLI: `dna-agents`. |
-| **dna-agents-mcp** | `dna-agents-mcp/` | FastMCP server exposing compiler tools over MCP (stdio and HTTP transports). CLI: `dna-agents-mcp`. |
+| **just-dna-agents** | `just-dna-agents/` | Core library: module spec validation, compilation to parquet, Ensembl rsid/position resolver, reverse engineering from existing modules. CLI: `just-dna-agents`. |
+| **just-dna-agents-mcp** | `just-dna-agents-mcp/` | FastMCP server exposing compiler tools over MCP (stdio and HTTP transports). CLI: `just-dna-agents-mcp`. |
 
 ```
-dna-agents/
+just-dna-agents/
 ├── pyproject.toml                  # workspace root
 ├── AGENTS.md                       # cross-tool agent instructions
 ├── CLAUDE.md                       # Claude Code project instructions
 ├── .mcp.json                       # MCP server config for development
 ├── .env.template                   # env var template
 │
-├── dna-agents/                     # core library
+├── just-dna-agents/                     # core library
 │   ├── pyproject.toml
-│   └── src/dna_agents/
+│   └── src/just_dna_agents/
 │       ├── compiler.py             # validate, compile, reverse
 │       ├── models.py               # pydantic models (VariantRow, ModuleSpec, ...)
 │       ├── resolver.py             # Ensembl DuckDB rsid <-> position resolver
 │       └── cli.py                  # Typer CLI
 │
-├── dna-agents-mcp/                 # MCP server
+├── just-dna-agents-mcp/                 # MCP server
 │   ├── pyproject.toml
-│   └── src/dna_agents_mcp/
+│   └── src/just_dna_agents_mcp/
 │       ├── server.py               # FastMCP server (create_server factory)
 │       ├── config.py               # pydantic-settings config
 │       └── cli.py                  # Typer CLI
@@ -560,7 +560,7 @@ The reference is located in this order (see `just_dna_compiler.cache`):
    platformdirs user cache — the same layout just-dna-lite uses
    (`~/.cache/just-dna-pipelines/ensembl_variations/`)
 
-If none is present, `dna-agents compile --resolve` provisions the parquet cache
+If none is present, `just-dna-agents compile --resolve` provisions the parquet cache
 from HuggingFace Hub (`just-dna-seq/ensembl_variations`) into
 `<base>/ensembl_variations/data/`. If the download can't run (no
 `huggingface_hub`), resolution is skipped with a warning rather than failing.

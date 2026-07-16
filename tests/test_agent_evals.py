@@ -27,7 +27,7 @@ from pathlib import Path
 
 import pytest
 
-from dna_agents.eval_scorer import score_module
+from just_dna_agents.eval_scorer import score_module
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EVALS_DIR = REPO_ROOT / "data" / "evals"
@@ -62,7 +62,7 @@ def _run_claude_agent(freeform_input: str, output_dir: Path) -> subprocess.Compl
     prompt = (
         f"Create a genetics annotation module based on the following input.\n"
         f"Write output files (module_spec.yaml, variants.csv, studies.csv) to: {output_dir}/\n"
-        f"Then validate with: uv run dna-agents validate {output_dir}/\n"
+        f"Then validate with: uv run just-dna-agents validate {output_dir}/\n"
         f"Fix any validation errors before finishing.\n\n"
         f"---\n\n"
         f"{freeform_input}"

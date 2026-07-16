@@ -1,5 +1,5 @@
 """
-Shared test configuration for dna-agents.
+Shared test configuration for just-dna-agents.
 
 Loads .env at the repo root so API keys and tokens are available
 for integration / agent smoke tests.

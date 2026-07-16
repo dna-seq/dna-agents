@@ -4,9 +4,9 @@ requires-python = ">=3.14"
 
 [manifest]
 members = [
-    "dna-agents",
-    "dna-agents-mcp",
-    "dna-agents-workspace",
+    "just-dna-agents",
+    "just-dna-agents-mcp",
+    "just-dna-agents-workspace",
 ]
 
 [[package]]
@@ -263,95 +263,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/74/89/f4c775c651d91f9cd8149f70baec94c902a34e5f17a7a67881881bcfb244/cyclopts-4.20.0.tar.gz", hash = "sha256:1d819de2b12dc6b1c9f17ce0f4937d82922c0b83ac846eb4b3289c9c9f321c9f", size = 190236, upload-time = "2026-06-29T15:04:42.253Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/dd/d4/7243bc65d33c5ff5150569c42c8c1154aadae20b25638afe35f7f568489c/cyclopts-4.20.0-py3-none-any.whl", hash = "sha256:0b4337e9c11303d86b33d3f37c629dc01638f84591681e0e5611286bdd507646", size = 229383, upload-time = "2026-06-29T15:04:40.621Z" },
-]
-
-[[package]]
-name = "dna-agents"
-version = "0.4.0"
-source = { editable = "dna-agents" }
-dependencies = [
-    { name = "httpx" },
-    { name = "huggingface-hub" },
-    { name = "just-dna-compiler" },
-    { name = "just-dna-format" },
-    { name = "polars" },
-    { name = "pyyaml" },
-    { name = "rich" },
-    { name = "typer" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pytest" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "httpx", specifier = ">=0.28.0" },
-    { name = "huggingface-hub", specifier = ">=0.27.0" },
-    { name = "just-dna-compiler", specifier = ">=0.4.0" },
-    { name = "just-dna-format", specifier = ">=0.4.0" },
-    { name = "polars", specifier = ">=1.42.1" },
-    { name = "pyyaml", specifier = ">=6.0.3" },
-    { name = "rich", specifier = ">=15.0.0" },
-    { name = "typer", specifier = ">=0.26.8" },
-]
-
-[package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=9.1.1" }]
-
-[[package]]
-name = "dna-agents-mcp"
-version = "0.4.0"
-source = { editable = "dna-agents-mcp" }
-dependencies = [
-    { name = "dna-agents" },
-    { name = "fastmcp", extra = ["tasks"] },
-    { name = "just-dna-compiler" },
-    { name = "just-dna-format" },
-    { name = "pydantic-settings" },
-    { name = "python-dotenv" },
-    { name = "typer" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "dna-agents", editable = "dna-agents" },
-    { name = "fastmcp", extras = ["tasks"], specifier = ">=3.4.2" },
-    { name = "just-dna-compiler", specifier = ">=0.4.0" },
-    { name = "just-dna-format", specifier = ">=0.4.0" },
-    { name = "pydantic-settings", specifier = ">=2.14.2" },
-    { name = "python-dotenv", specifier = ">=1.2.2" },
-    { name = "typer", specifier = ">=0.26.8" },
-]
-
-[[package]]
-name = "dna-agents-workspace"
-version = "0.4.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "just-dna-registry" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "dna-agents" },
-    { name = "dna-agents-mcp" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "python-dotenv" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "just-dna-registry", specifier = ">=0.9.1" }]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "dna-agents", editable = "dna-agents" },
-    { name = "dna-agents-mcp", editable = "dna-agents-mcp" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-asyncio", specifier = ">=1.4.0" },
-    { name = "python-dotenv", specifier = ">=1.2.2" },
 ]
 
 [[package]]
@@ -718,6 +629,95 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/19/74/a633ee74eb36c44aa6d1095e7cc5569bebf04342ee146178e2d36600708b/jsonschema_specifications-2025.9.1.tar.gz", hash = "sha256:b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d", size = 32855, upload-time = "2025-09-08T01:34:59.186Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/41/45/1a4ed80516f02155c51f51e8cedb3c1902296743db0bbc66608a0db2814f/jsonschema_specifications-2025.9.1-py3-none-any.whl", hash = "sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe", size = 18437, upload-time = "2025-09-08T01:34:57.871Z" },
+]
+
+[[package]]
+name = "just-dna-agents"
+version = "0.4.0"
+source = { editable = "just-dna-agents" }
+dependencies = [
+    { name = "httpx" },
+    { name = "huggingface-hub" },
+    { name = "just-dna-compiler" },
+    { name = "just-dna-format" },
+    { name = "polars" },
+    { name = "pyyaml" },
+    { name = "rich" },
+    { name = "typer" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.28.0" },
+    { name = "huggingface-hub", specifier = ">=0.27.0" },
+    { name = "just-dna-compiler", specifier = ">=0.4.0" },
+    { name = "just-dna-format", specifier = ">=0.4.0" },
+    { name = "polars", specifier = ">=1.42.1" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
+    { name = "rich", specifier = ">=15.0.0" },
+    { name = "typer", specifier = ">=0.26.8" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.1.1" }]
+
+[[package]]
+name = "just-dna-agents-mcp"
+version = "0.4.0"
+source = { editable = "just-dna-agents-mcp" }
+dependencies = [
+    { name = "fastmcp", extra = ["tasks"] },
+    { name = "just-dna-agents" },
+    { name = "just-dna-compiler" },
+    { name = "just-dna-format" },
+    { name = "pydantic-settings" },
+    { name = "python-dotenv" },
+    { name = "typer" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastmcp", extras = ["tasks"], specifier = ">=3.4.2" },
+    { name = "just-dna-agents", editable = "just-dna-agents" },
+    { name = "just-dna-compiler", specifier = ">=0.4.0" },
+    { name = "just-dna-format", specifier = ">=0.4.0" },
+    { name = "pydantic-settings", specifier = ">=2.14.2" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
+    { name = "typer", specifier = ">=0.26.8" },
+]
+
+[[package]]
+name = "just-dna-agents-workspace"
+version = "0.4.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "just-dna-registry" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "just-dna-agents" },
+    { name = "just-dna-agents-mcp" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "python-dotenv" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "just-dna-registry", specifier = ">=0.9.1" }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "just-dna-agents", editable = "just-dna-agents" },
+    { name = "just-dna-agents-mcp", editable = "just-dna-agents-mcp" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-asyncio", specifier = ">=1.4.0" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
 ]
 
 [[package]]

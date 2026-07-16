@@ -26,7 +26,7 @@ Rules: star-allele strings are verbatim truth; activity_phenotype bins must not 
 and must include one unresolved=true sentinel; verify defining-variant rsids/alleles on
 the GRCh38 forward strand. Call the MCP get_spec_format tool for the exact columns of
 each row model. Then validate with
-  uv run dna-agents validate ${outputDir}/<module_name>/
+  uv run just-dna-agents validate ${outputDir}/<module_name>/
 and fix any errors until it passes. Report the final spec directory path.`
 
 const created = await agent(createPrompt, {

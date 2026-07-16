@@ -190,7 +190,7 @@ Wrong alleles make the module produce incorrect genotype interpretations. You MU
 2. For each variant: confirm rsid OR GRCh38 coordinates, gene, genotypes, weights, states
 3. Collect PMIDs from attached material first, EuropePMC otherwise (max 3 queries)
 4. Write spec files to the output directory
-5. Validate with `uv run dna-agents validate <spec_dir>`
+5. Validate with `uv run just-dna-agents validate <spec_dir>`
 6. Fix errors and re-validate
 7. Write MODULE.md documenting purpose, sources, design decisions
 
