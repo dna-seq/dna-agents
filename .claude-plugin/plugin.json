@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "just-dna-agents",
+  "displayName": "just-dna-agents: Genetics Annotation",
+  "version": "0.4.0",
+  "description": "Research, validate, and compile genetics annotation modules with evidence-aware genomics workflows.",
+  "author": {
+    "name": "DNA Seq"
+  },
+  "homepage": "https://github.com/dna-seq/just-dna-agents",
+  "repository": "https://github.com/dna-seq/just-dna-agents",
+  "license": "MIT",
+  "keywords": [
+    "genomics",
+    "variant-annotation",
+    "pharmacogenomics",
+    "polygenic-score",
+    "bioinformatics"
+  ],
+  "skills": "./skills/",
+  "agents": [
+    "./.claude/agents/module-creator.md",
+    "./.claude/agents/paper-scout.md",
+    "./.claude/agents/pgs-module-creator.md",
+    "./.claude/agents/pgx-module-creator.md",
+    "./.claude/agents/researcher.md",
+    "./.claude/agents/reviewer.md"
+  ],
+  "commands": "./commands/",
+  "mcpServers": "./.claude-plugin/mcp.json"
+}

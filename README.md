@@ -81,6 +81,20 @@ directly.
 
 ### Claude Code
 
+**Recommended: install the guided workflow plugin from the DNA Seq marketplace.**
+It includes module-authoring skills, specialized agents, slash commands, the
+annotation MCP server, and BioContext KB:
+
+```bash
+claude plugin marketplace add dna-seq/dna-seq-claude-marketplace
+claude plugin install just-dna-agents@dna-seq
+```
+
+The plugin runs the published `just-dna-agents-mcp` package with `uvx`; no clone
+is required. Use `claude plugin update` to receive later plugin versions.
+
+**Tools only:** add the MCP server directly:
+
 ```bash
 claude mcp add just-dna-agents-mcp -- uvx just-dna-agents-mcp serve --transport stdio
 ```
@@ -119,9 +133,11 @@ Restart Claude Desktop. The module compiler tools will appear in the tools menu
 
 ### Cursor
 
-This repo already ships a portable root [`.mcp.json`](.mcp.json) (`uv run`
-just-dna-agents-mcp + BioContext KB). Open the project in Cursor and the MCP servers
-should load — no machine-specific `.cursor/mcp.json` required.
+Cursor does not consume Claude Code marketplace plugins. For a cloned project,
+this repo ships a portable root [`.mcp.json`](.mcp.json) (`uv run`
+just-dna-agents-mcp + BioContext KB) plus committed rules and commands. Open the
+project in Cursor and the MCP servers should load — no machine-specific
+`.cursor/mcp.json` required.
 
 Shared Cursor config (committed; safe for every clone):
 
@@ -149,6 +165,23 @@ If you prefer installing the MCP package without cloning:
     "just-dna-agents-mcp": {
       "command": "uvx",
       "args": ["just-dna-agents-mcp", "serve", "--transport", "stdio"]
+    }
+  }
+}
+```
+
+For a packaged MCP setup, configure Cursor to run:
+
+```json
+{
+  "mcpServers": {
+    "just-dna-agents-mcp": {
+      "command": "uvx",
+      "args": ["just-dna-agents-mcp@0.4.0", "serve", "--transport", "stdio"]
+    },
+    "biocontext-kb": {
+      "type": "url",
+      "url": "https://biocontext-kb.fastmcp.app/mcp"
     }
   }
 }
@@ -241,6 +274,8 @@ shared by Claude Code and Cursor. Do not duplicate them under `.cursor/`.
 |-------|-------------|--------|-------------|
 | Paper Scout | `@paper-scout` | slash **paper-scout** / Task `paper-scout` | Triage papers for extractable SNP data |
 | Module Creator | `@module-creator` | Task `module-creator` | Solo end-to-end module authoring |
+| PGS Module Creator | `@pgs-module-creator` | Task `pgs-module-creator` | Curate published PGS Catalog entries |
+| PGx Module Creator | `@pgx-module-creator` | Task `pgx-module-creator` | Author star-allele pharmacogenomics tables |
 | Researcher | `@researcher` | Task `researcher` | Variant analysis + PMID collection |
 | Reviewer | `@reviewer` | Task `reviewer` | Quality / consensus review |
 

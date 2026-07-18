@@ -9,49 +9,6 @@ export const meta = {
   ],
 }
 
-const RESEARCHER_PROMPT = `You are a genetics research assistant specializing in SNP variant analysis.
-You work independently — other researchers are doing the same task in parallel.
-Your output will be compared against theirs to establish consensus.
-
-## Rules
-- GRCh38 ONLY for all coordinates
-- The compiler auto-resolves rsid <-> coordinates. You only need ONE.
-- Use cautious language: "associated with", "may contribute to", "suggests"
-- NEVER: "causes", "guarantees", "will result in"
-- Never invent PMIDs
-
-## Output format
-One block per variant:
-rsid: rs1234567
-gene: GENE1 | ref: A > alt: G
-genotypes:
-  A/A: neutral, weight 0 — reference genotype observation
-  A/G: risk, weight -0.6 — association description
-  G/G: risk, weight -1.1 — association description
-evidence:
-  PMID:12345678 — study design, population, finding
-
-RESEARCH TASK:
-`
-
-const REVIEWER_PROMPT = `You are a genetics module quality reviewer. Check the draft module for:
-1. Research provenance — variants confirmed by multiple researchers = high confidence
-2. Genome build — must be GRCh38 only
-3. Variant integrity — real rsids, sorted alleles, all genotypes present, wild-type included
-4. Weight/state consistency — negative=risk, positive=protective, magnitudes reasonable
-5. Scientific accuracy — real PMIDs, correct gene symbols
-6. Epistemic humility — no deterministic claims, no individual predictions
-
-The compiler auto-resolves missing rsid/coordinates, so do NOT flag those as errors.
-
-Return:
-- ERRORS: must-fix issues
-- WARNINGS: should-fix issues
-- OK: what passed
-
-DRAFT TO REVIEW:
-`
-
 const FINDINGS_SCHEMA = {
   type: 'object',
   properties: {
@@ -121,9 +78,10 @@ log(`Spawning ${numResearchers} independent researchers...`)
 
 const researchResults = await parallel(
   Array.from({ length: numResearchers }, (_, i) => () =>
-    agent(RESEARCHER_PROMPT + task, {
+    agent(task, {
       label: `researcher-${i + 1}`,
       phase: 'Research',
+      agentType: 'researcher',
       schema: FINDINGS_SCHEMA,
     })
   )
@@ -172,9 +130,10 @@ const draftSummary = consensusVariants.map(v => {
 phase('Review')
 log('Sending draft to reviewer...')
 
-const review = await agent(REVIEWER_PROMPT + draftSummary, {
+const review = await agent(draftSummary, {
   label: 'reviewer',
   phase: 'Review',
+  agentType: 'reviewer',
   schema: REVIEW_SCHEMA,
 })
 
